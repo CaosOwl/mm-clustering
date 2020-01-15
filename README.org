@@ -1,0 +1,20 @@
+* Short description
+This repository was created
+* Data 
+** Data reconstruction
+   All the code to extract MM clusters from the na64 are saved in a branch of the main na64
+   git repository [[https://gitlab.cern.ch/P348/p348-daq/tree/mm-clustering][link]]
+** Data format
+** Run description
+   [[./doc/runlist.pdf][run list]]
+   |  Run | Trigger           | S_1,10^3 | Run Type                                    | note                       |
+   |------+-------------------+----------+---------------------------------------------+----------------------------|
+   | 4038 | S1-4-V0           | 6600     | 100 GeV Calibration Electron Invisible 2018 |                            |
+   | 3925 | Trig = S1-4-V+Psh | ----     | 100 GeV Calibration Hadron Invisible 2018   |                            |
+   | 4267 | S1-2-V0-Wcat+S4   | ----     | 150 GeV Calibration Hadron Visible 2018     | Changeof latency for MSADC |
+   | 4238 | S1-2-V0-Wcat      | 3500     | 150 GeV calibration Electron Visible 2018   |                            |
+   |      |                   |          |                                             |                            |
+* Discussions
+* Diary
+** <2020-01-15 Wed>
+   - 
