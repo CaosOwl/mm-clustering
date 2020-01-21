@@ -84,18 +84,22 @@ namespace Utils
  string RemoveExtension(const char* input,const char* escape);
 
  
- template<typename temp> void SafeSetBranchAddress(TTree* chain,const char* BranchName,temp& var, const uint Verbose = 0)
+ template<typename temp> bool SafeSetBranchAddress(TTree* chain,const char* BranchName,temp& var, const uint Verbose = 0)
  {
 		TBranch* br = (TBranch*)chain->GetListOfBranches()->FindObject(BranchName);
 		if(br)
    {
     chain->SetBranchAddress(BranchName, &var);
+    if(Verbose > 0)
+     cout << "Branch with name: " << BranchName << " Exist! Variable was assigned \n";  
+    return true;
    }
 		else if(Verbose > 0)
    {
     cout << "Branch with name: " << BranchName << " does not exist, variable will be not assigned" << endl;
-    chain->SetBranchStatus(BranchName, 0);
-   }				  
+    chain->SetBranchStatus(BranchName, 0);    
+   }
+  return false;
  }
 
  inline double GetParameter(TList* list,const char* parname, const uint Verbose = 0)
