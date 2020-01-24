@@ -9,7 +9,7 @@ INCLUDEDIR := source/include
 EXEDIR     := examples
 
 #GLOBAL PARAMETER
-STDOPT := -O2
+#STDOPT := -O2
 
 #ANALYSIS DIRECTORIES
 ANACONDADIR = /home/deppy/.anaconda3
@@ -18,6 +18,7 @@ H5LIBPATH  := $(ANACONDADIR)/pkgs/hdf5-1.10.2-hba1933b_1/lib #local computer
 
 #INCLUDE FILE DIRECTORY
 CXXFLAGS += -I$(INCLUDEDIR)/
+CXXFLAGS += -I/usr/include/eigen3 #eigen standard include path
 
 #FILES
 INCLUDEFILES := $(wildcard $(INCLUDEDIR)/*.hh)
@@ -33,7 +34,7 @@ LIBS := -lGeom -lEG -lMinuit  -lTMVA -lSpectrum
 
 #HDF5LIBS :=  -L$(H5LIBPATH) -lhdf5 -Wl,-rpath $(H5LIBPATH)
 
-TARGETS := template test_clustering
+TARGETS := template test_clustering create_toy
 
 all: $(TARGETS)
 
@@ -44,7 +45,7 @@ $(OBJECTFILES): $(OBJDIR)/%o : $(SRCDIR)/%cc $(INCLUDEDIR)/%hh
 	@echo -e "object file \033[1;31m"$@"\033[0m has been created"
 
 #ANALYSIS EXECUTABLES
-%: $(EXEDIR)/%.cc $(OBJECTFILES)
+%: $(EXEDIR)/%.cc $(OBJECTFILES) $(INCLUDEFILES)
 	$(CXX) -o $(OBJDIR)/$@.o -c $< $(CXXFLAGS) $(STDOPT) 
 	$(CXX) -o $@ $(OBJDIR)/$@.o $(OBJECTFILES) $(CXXFLAGS) $(STDOPT) $(LIBS)
 	@echo -e "executable \033[1;32m"$@"\033[0m has been created"
