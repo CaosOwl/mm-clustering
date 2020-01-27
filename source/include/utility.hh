@@ -10,6 +10,7 @@
 #include <TGenPhaseSpace.h>
 #include <TLorentzVector.h>
 #include <TParameter.h>
+#include <TString.h>
 
 //std library
 #include <vector>
@@ -83,6 +84,8 @@ namespace Utils
 
  string RemoveExtension(const char* input,const char* escape);
 
+ bool FileExist(TString);
+
  
  template<typename temp> bool SafeSetBranchAddress(TTree* chain,const char* BranchName,temp& var, const uint Verbose = 0)
  {
@@ -120,6 +123,15 @@ namespace Utils
  bool BranchExist(TChain* chain,TString BranchName);
 
  void AddInfoParameters(TTree* tree, TList* list);
+
+ template<class var>
+ bool AddParameterToList(TList* list, const char* name, var target)
+ {
+  TParameter<var> *par = new TParameter<var>(name, target);
+  list->Add(par);
+  return true;
+ }
+
  
 } //end namespace Utils
 

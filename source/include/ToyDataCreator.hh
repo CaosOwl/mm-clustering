@@ -1,6 +1,7 @@
 #pragma once
 //root
 #include"TH1.h"
+#include"TTree.h"
 //std
 #include<vector>
 
@@ -15,7 +16,8 @@ namespace Micromega
 
  public:
   //CONSTRUCTOR
-  ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t);
+  ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const MapMethod mapmethod = ALGO);
+  ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const TString filename);
  
   bool GenerateToy(UInt_t*, UInt_t*, UInt_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true);
 
@@ -26,6 +28,9 @@ namespace Micromega
   Double_t GetSigma(UInt_t index);
   UInt_t   GetCharge(UInt_t index);
 
+  //utilities
+  void SaveMultiplexMapToTree(TTree*) const;
+
  private:
   //Fundamental parameters
   UInt_t NumberOfChannels;
@@ -34,7 +39,6 @@ namespace Micromega
   UInt_t MPVCharge;
   double Sigma;
   //mapping
-  const char* targetfile;
   std::vector<UInt_t> ReverseMultiplexMAP;
 
   //Inside the event
@@ -53,6 +57,7 @@ namespace Micromega
   void BuildMultiplexingFromAlgorithm();
   void BuildMultiplexingFromTXTFile(const char* filename);
   void BuildMultiplexingFromROOTFile(const char* filename);
+  TString BuildMultiplexFileName() const;
  };
 
 } //END NAMESPACE MICROMEGA

@@ -6,6 +6,7 @@
 //user
 #include"ToyDataCreator.hh"
 #include"Minimizationfunctions.hh"
+#include"utility.hh"
 
 namespace Micromega
 {
@@ -13,7 +14,8 @@ namespace Micromega
  ToyDataCreator::ToyDataCreator(const UInt_t NumberOfChannels_,
                                 const UInt_t MultiplexFactor_,
                                 const UInt_t MPVCharge_,
-                                const Double_t Sigma_
+                                const Double_t Sigma_,
+                                const MapMethod mapmethod
                                 )
   :
   NumberOfChannels(NumberOfChannels_),
@@ -40,9 +42,56 @@ namespace Micromega
 
   //initialize maps
   FillRegMatrix();
-  FillMultiplexingMatrix(MapMethod::ALGO);
-                
-  
+  FillMultiplexingMatrix(mapmethod);                  
+ }
+ 
+ ToyDataCreator::ToyDataCreator(const UInt_t NumberOfChannels_,
+                                const UInt_t MultiplexFactor_,
+                                const UInt_t MPVCharge_,
+                                const Double_t Sigma_,
+                                const TString filename
+                                )
+  :
+  NumberOfChannels(NumberOfChannels_),
+  MultiplexFactor(MultiplexFactor_),
+  MPVCharge(MPVCharge_),
+  Sigma(Sigma_)
+ {
+  //calcualte number of strips
+  NumberOfStrips = NumberOfChannels * MultiplexFactor;
+  //Initiliaze Balint Matrices (defined at global level)
+  mmultiplex = SparseMatrix<double>(NumberOfChannels, NumberOfStrips);
+  vstrips = MatrixXd(NumberOfStrips, 1);
+  vmultiplex = MatrixXd(NumberOfChannels, 1);
+  mQ2 = MatrixXd(NumberOfStrips, 1);
+  mQ2T = MatrixXd(1, NumberOfStrips);
+  ms = MatrixXd(1,1);
+  mreg = SparseMatrix<double>(NumberOfStrips, NumberOfStrips);
+  //other globals
+  NStrips = NumberOfStrips;
+  NChan   = NumberOfChannels;
+  MFac    = MultiplexFactor;
+  //reverse multiplex map
+  ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
+
+  //initialize maps
+  FillRegMatrix();
+  //decide what kind of file it is
+  const bool ItExist = Utils::FileExist(filename);
+  if(ItExist)
+   {
+    if(filename.EndsWith(".root"))
+     BuildMultiplexingFromROOTFile(filename);
+    else if(filename.EndsWith(".txt"))
+     BuildMultiplexingFromTXTFile(filename);
+    else
+     {
+      std::cout << "\033[1;34m WARNING: \033[0m" << filename << " has an unknown format, using algorithm for multiplexing map \n";
+      BuildMultiplexingFromAlgorithm();
+     }
+   }
+
+    
  }
 
  void ToyDataCreator::Clear()
@@ -143,8 +192,7 @@ namespace Micromega
    {
     //std::cout << strip << " " << ReverseMultiplexMAP[strip] << " \n";
     Chan[ReverseMultiplexMAP[strip]] += Strips_Physical[strip];
-   } 
-
+   }   
 
   if(DoMinimization)
    {
@@ -173,16 +221,30 @@ namespace Micromega
   
   mmultiplex.reserve(VectorXd::Constant(NumberOfStrips, MultiplexFactor));
 
+  //prepare string
+  TString mapname;
+
   switch(mapmethod)
    {
    case ALGO:
     BuildMultiplexingFromAlgorithm();
     break;
    case TXT:
-    BuildMultiplexingFromTXTFile(targetfile);
+    //search if such map exist
+    mapname.Form("multiplexingmaps/multiplexing_p%i_m%i.txt", NumberOfChannels, MultiplexFactor);
+    //check if it exist
+    if(Utils::FileExist(mapname))
+     {
+     BuildMultiplexingFromTXTFile(mapname);
+     }
+    else
+     {
+      std::cout << "\033[1;34 WARNING \033[0m File: " << mapname << "does not exist, building standard multiplex map \n";
+      BuildMultiplexingFromAlgorithm();
+     }
     break;
    case ROOT:
-    BuildMultiplexingFromROOTFile(targetfile);
+    BuildMultiplexingFromROOTFile(mapname);
     break;
    default:
     BuildMultiplexingFromAlgorithm();
@@ -236,18 +298,17 @@ namespace Micromega
   else
    {
     UInt_t strip, channel;
-    UInt_t flag;
-    while(true)
-     {
-      reader >> strip >> channel >> flag;
-      if(!reader.good())break;
+    Double_t flag;
+    while(reader >> channel >> strip >> flag)
+     {      
       if(flag > 0)
        {
-        mmultiplex.insert(channel, strip) = flag;
+        mmultiplex.insert(channel, strip) = 1;
         ReverseMultiplexMAP[strip] = channel;
        }
      }
    }
+  mmultiplex.makeCompressed();  
   std::cout << "Map successfully red from file: " << filename << "\n";
   
  } // from txt finish function
@@ -297,6 +358,25 @@ namespace Micromega
     std::cout << index << " is larger than the number of clusters \n";
     return 999;
    }
+ }
+
+ void ToyDataCreator::SaveMultiplexMapToTree(TTree* tree) const
+ {
+  UInt_t MicromegasMap[NumberOfChannels][MultiplexFactor];
+  tree->Branch("MicromegasMap", &MicromegasMap, TString::Format("MicromegasMapint[%i][%i]/i", NumberOfChannels, MultiplexFactor));
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
+   for(UInt_t mfac(0); mfac < MultiplexFactor; ++mfac)
+    {
+     //find strip, (very inefficient)
+     UInt_t strip(0);
+     while(ReverseMultiplexMAP[strip] != chan)++strip;
+     MicromegasMap[chan][mfac] = strip;
+    }
+
+  //fill it
+  tree->Fill();
+   
+
  }
 
 

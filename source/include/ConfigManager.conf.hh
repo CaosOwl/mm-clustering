@@ -90,6 +90,10 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         {"amplitude","double","set amplitude of clusters in sigma","all"}
         ,
         {"from-file","switch","take multiplex map from file","all"}
+        ,
+        {"save-waveforms","switch","save all created cluster in histograms","all"}
+        ,
+        {"compression","int","compression level of the root file","all"}                
 };
 
 // _.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-._

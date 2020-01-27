@@ -56,9 +56,10 @@ int main (int argc, char *argv[])
                   config->GetNumberOfChannels(),
                   config->GetMultiplexFactor(),
                   config->GetMPVCharge(),
-                  config->GetSigma());
+                  config->GetSigma());  
 
-  TFile* output = new TFile(outputname +".root", "RECREATE");
+  TFile* output = new TFile(outputname +".root", "RECREATE");  
+  output->SetCompressionSettings(config->GetCompressionLevel());
   //new tree
   TTree* clustree = new TTree("ClusterTree", "This tree Contains Clusters created with a toy model");
   //fix the branches
@@ -91,11 +92,21 @@ int main (int argc, char *argv[])
 
   
   //main creator object
-  Micromega::ToyDataCreator Creator(config->GetNumberOfChannels(),
-                                    config->GetMultiplexFactor(),
-                                    config->GetMPVCharge(),
-                                    config->GetSigma()
-                                    );
+  Micromega::ToyDataCreator* Creator;
+  if(false)
+   return 1;
+  else
+   {
+    const Micromega::MapMethod mapmethod = config->MultiplexFromFileSwitch() ?
+     Micromega::MapMethod::TXT : Micromega::MapMethod::ALGO;
+    
+    Creator = new Micromega::ToyDataCreator(config->GetNumberOfChannels(),
+                                            config->GetMultiplexFactor(),
+                                            config->GetMPVCharge(),
+                                            config->GetSigma(),
+                                            mapmethod
+                                            );
+   }
 
   //Histograms
   TH1F* Amplitude = new TH1F("Amplitude", "Amplitude of the Clusters; signal output", 1000, 0, 4000);
@@ -114,18 +125,47 @@ int main (int argc, char *argv[])
    {
 
     //Generate Toy
-    Creator.GenerateToy(ChanOutput,            
-                        StripsOutput,
-                        StripsOutputProcessed,
-                        config->GetNClusters(),    //number of clusters to generate
-                        false);                    //If minimization procedure must be applied or not
+    Creator->GenerateToy(ChanOutput,            
+                         StripsOutput,
+                         StripsOutputProcessed,
+                         config->GetNClusters(),    //number of clusters to generate
+                         false);                    //If minimization procedure must be applied or not
 
     //assign true
     for(UInt_t j(0);j < config->GetNClusters();++j)
      {
-      TruePositions[j] = Creator.GetPosition(j);
-      Sigmas[j]        = Creator.GetSigma(j);
-      Charges[j]       = Creator.GetCharge(j);
+      TruePositions[j] = Creator->GetPosition(j);
+      Sigmas[j]        = Creator->GetSigma(j);
+      Charges[j]       = Creator->GetCharge(j);
+     }
+
+    //save histogram
+    if(config->SaveWaveformsSwitch())
+     {
+      TString foldername;
+      foldername.Form("histograms/event_%i", i);
+      output->mkdir(foldername);output->cd(foldername);
+      TH1F* stripsphys = new TH1F(TString::Format("stripsphys_evt_%i", i),
+                                  TString::Format("strip physical for event %i", i),
+                                  config->GetNumberOfStrips(),
+                                  -0.5,
+                                  config->GetNumberOfStrips() -0.5);
+      TH1F* stripsreco = new TH1F(TString::Format("stripsreco_evt_%i", i),
+                                  TString::Format("strip reconstructed for event %i", i),
+                                  config->GetNumberOfStrips(),
+                                  -0.5,
+                                  config->GetNumberOfStrips() -0.5);
+      TH1F* chanout   = new TH1F(TString::Format("channel_evt_%i", i),
+                                 TString::Format("channel output for event %i", i),
+                                 config->GetNumberOfChannels(),
+                                 -0.5,
+                                 config->GetNumberOfChannels() -0.5);
+      //fill it      
+      for(UInt_t n(0); n < config->GetNumberOfStrips(); ++n){stripsphys->SetBinContent(n, StripsOutput[n]);stripsreco->SetBinContent(n, StripsOutputProcessed[n]);}
+      for(UInt_t n(0); n < config->GetNumberOfChannels(); ++n)chanout->SetBinContent(n, ChanOutput[n]);
+            
+      stripsphys->Write();stripsreco->Write();chanout->Write();
+      output->cd();       
      }
     
 
@@ -150,9 +190,14 @@ int main (int argc, char *argv[])
 
   TTree* timetree = new TTree("time", "time taken by the program");
   MyTime.SaveInTree(timetree);
+  //save import parameter in info tree
+  TTree* infotree = new TTree("InfoTree", "Parameter used for the toy");
+  config->SaveParamterInTree(infotree);
+  Creator->SaveMultiplexMapToTree(infotree);
   //write to file
   clustree->Write();
   timetree->Write();
+  infotree->Write();
   output->Close();
 
   return 0;

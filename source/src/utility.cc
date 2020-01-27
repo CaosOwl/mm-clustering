@@ -1,4 +1,6 @@
 #include"utility.hh"
+//root
+#include"TSystemFile.h"
 
 using namespace std;
 
@@ -170,6 +172,17 @@ string GetDir(const char* input,const char* escape)
    }  
 		return filename;
 } //end of GetDir Name
+
+ bool FileExist(TString FileName)
+ {
+  const char* filename  = FileName.Data();
+  const char* directory = (GetDir(filename)).c_str();
+  TSystemFile* thisfile = new TSystemFile(filename, directory);
+
+  const bool ItExist = thisfile;
+
+  return ItExist;
+ }
 
   //moved in the header to keep template implementation
  #if 0

@@ -1,4 +1,6 @@
 #pragma once
+//root
+#include "TTree.h"
 //user
 #include "ConfigManager.hh"
 #include "utility.hh"
@@ -21,9 +23,11 @@ namespace Config
   
   //ACCESSORIES
   bool CreateOutDirectory();
+  bool SaveParamterInTree(TTree*);
 
   //GET FUNCTIONS
   myint          GetNEvent() const                  { return Nevent;}
+  myint          GetCompressionLevel() const        { return compression;}  
   myint          GetVerbose() const                 { return Verbose;}
   myint          GetNClusters() const               { return NClusters;}
   myint          GetNumberOfChannels() const        { return NumberOfChannels;}
@@ -31,15 +35,19 @@ namespace Config
   myint          GetNumberOfStrips() const          { return NumberOfStrips;}
   myint          GetMPVCharge() const               { return MPVCharge;}
   myfloat        GetSigma() const                   { return Sigma;}
-  bool           MultiplexFromFileSwitch()          { return MultiplexFromFile;}
   std::string    GetOutDir() const                  { return outdir;}
   TString        GetFileNamePath() const            { return outname;}
+  //Switches
+  bool           MultiplexFromFileSwitch()          { return MultiplexFromFile;}
+  bool           SaveWaveformsSwitch()              { return SaveWaveforms;}
+  bool           MinimizationSwitch()               { return ApplyMinimization;}  
 
  private:
   //CONFIGURATION
   ConfigManager configuration;
   //configuration variable
   myint     Nevent;
+  myint     compression;
   myint     Verbose;
   myint     NClusters;
   myint     NumberOfChannels;
@@ -47,7 +55,10 @@ namespace Config
   myint     NumberOfStrips;
   myint     MPVCharge;
   myfloat   Sigma;
+  //switches
   bool      MultiplexFromFile;
+  bool      SaveWaveforms;
+  bool      ApplyMinimization;
   
   TString     outname;
   std::string outdir;
