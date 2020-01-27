@@ -91,7 +91,6 @@ namespace Config
     std::cout << "\033[1;34 --> All will be minimized before storing: \033[0m \n";
    }
     
-
   //CreateOutDirectory();
   std::cout << "\033[1;34 --> Result will be saved in directory: \033[0m \033[1;31m " << outdir << "\033[0m \n";
 

@@ -95,6 +95,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,
         {"save-waveforms","switch","save all created cluster in histograms","all"}
         ,
+        {"apply-minimization","switch","apply minimization procedure to strips","all"}
+        ,        
         {"compression","int","compression level of the root file","all"}
 };
 
