@@ -22,6 +22,7 @@ namespace Config
   MultiplexFromFile         = false;
   SaveWaveforms             = false;
   ApplyMinimization         = false;
+  UseUserFile               = false;
   targetfile                = "dummy";
   outname.Form("ToyCluster_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
                NumberOfChannels,
@@ -71,6 +72,7 @@ namespace Config
   if(targetfile != "dummy")
    {
     std::cout << "--> Attempting to use \033[1;31" << targetfile << " \033[0m to create the multiplex map \n";
+    UseUserFile = true;
    }
   else if(!MultiplexFromFile)
    {

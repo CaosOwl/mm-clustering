@@ -177,11 +177,18 @@ string GetDir(const char* input,const char* escape)
  {
   const char* filename  = FileName.Data();
   const char* directory = (GetDir(filename)).c_str();
-  TSystemFile* thisfile = new TSystemFile(filename, directory);
-
-  const bool ItExist = thisfile;
-
-  return ItExist;
+  TFile* thisfile = new TFile(filename, "READ");
+  
+  if(thisfile)
+   {
+    thisfile->Close();
+    return true;
+   }
+  else
+   {
+    return false;
+   }
+  
  }
 
   //moved in the header to keep template implementation

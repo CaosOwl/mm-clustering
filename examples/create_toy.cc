@@ -93,7 +93,7 @@ int main (int argc, char *argv[])
   
   //main creator object
   Micromega::ToyDataCreator* Creator;
-  if(Utils::FileExist(config->GetTargetFile()))
+  if(config->UserFileSwitch())
    {
     const TString targetfile(config->GetTargetFile().c_str());
     Creator = new Micromega::ToyDataCreator(config->GetNumberOfChannels(),
@@ -102,6 +102,9 @@ int main (int argc, char *argv[])
                                             config->GetSigma(),
                                             targetfile
                                             );
+    //noise as well
+    Creator->InitializeNoiseFromROOTFile(config->GetTargetFile().c_str(), "MM3X_sigma");
+    Creator->SetNoiseMethod(Micromega::NoiseMethod::FROMFILE);
    }
   else
    {
@@ -117,6 +120,7 @@ int main (int argc, char *argv[])
    }
 
   //Histograms
+  output->cd();
   TH1F* Amplitude = new TH1F("Amplitude", "Amplitude of the Clusters; signal output", 1000, 0, 4000);
   TH1F* SigmaOut  = new TH1F("Sigma",     "Sigma of the Clusters; sigma [strips]",    15, 0, 15);
   TH1F* NCluster  = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);

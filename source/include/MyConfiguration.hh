@@ -41,7 +41,8 @@ namespace Config
   //Switches
   bool           MultiplexFromFileSwitch()          { return MultiplexFromFile;}
   bool           SaveWaveformsSwitch()              { return SaveWaveforms;}
-  bool           MinimizationSwitch()               { return ApplyMinimization;}  
+  bool           MinimizationSwitch()               { return ApplyMinimization;}
+  bool           UserFileSwitch()                   { return UseUserFile;}  
 
  private:
   //CONFIGURATION
@@ -58,6 +59,7 @@ namespace Config
   myfloat   Sigma;
   //switches
   bool      MultiplexFromFile;
+  bool      UseUserFile;
   bool      SaveWaveforms;
   bool      ApplyMinimization;
   

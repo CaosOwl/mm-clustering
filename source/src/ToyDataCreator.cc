@@ -21,7 +21,9 @@ namespace Micromega
   NumberOfChannels(NumberOfChannels_),
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
-  Sigma(Sigma_)
+  Sigma(Sigma_),
+  noisemethod(NoiseMethod::NONE),
+  clustermethod(ClusterMethod::GAUS)
  {
   //calcualte number of strips
   NumberOfStrips = NumberOfChannels * MultiplexFactor;
@@ -55,7 +57,9 @@ namespace Micromega
   NumberOfChannels(NumberOfChannels_),
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
-  Sigma(Sigma_)
+  Sigma(Sigma_),
+  noisemethod(NoiseMethod::NONE),
+  clustermethod(ClusterMethod::GAUS)
  {
   //calcualte number of strips
   NumberOfStrips = NumberOfChannels * MultiplexFactor;
@@ -81,9 +85,13 @@ namespace Micromega
   if(ItExist)
    {
     if(filename.EndsWith(".root"))
-     BuildMultiplexingFromROOTFile(filename);
+     {
+      BuildMultiplexingFromROOTFile(filename);
+     }
     else if(filename.EndsWith(".txt"))
-     BuildMultiplexingFromTXTFile(filename);
+     {
+      BuildMultiplexingFromTXTFile(filename);
+     }
     else
      {
       std::cout << "\033[1;34m WARNING: \033[0m" << filename << " has an unknown format, using algorithm for multiplexing map \n";
@@ -91,7 +99,6 @@ namespace Micromega
      }
    }
 
-    
  }
 
  void ToyDataCreator::Clear()
@@ -135,7 +142,7 @@ namespace Micromega
        strip = (UInt_t)(gRandom->Gaus(clusterposition, clustersigma));
       StripsOutput[strip] += 1;
      }    
-    break;    
+    break; 
     
    }
 
@@ -144,16 +151,29 @@ namespace Micromega
   //NOTA2: Poisson used for tyhe smearing
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
    {
-    StripsOutput[strip] = gRandom->Poisson(StripsOutput[strip]);
+    Double_t noise(0.);
+    Double_t value = gRandom->Poisson(StripsOutput[strip]);
+    if(value < 0)value = 0.;
+     
 
     //add noise tot the strips
     switch(noisemethod)
      {
      case NONE:
       break;
+     case FROMFILE:
+      //use saved noise
+      noise = gRandom->Gaus(0, Noise[ReverseMultiplexMAP[strip]]);
+      break;
      default:
       break;
      }
+    StripsOutput[strip] = value + noise;
+
+    if(noise + value > 0. )
+     StripsOutput[strip] = value + noise;
+    else
+     StripsOutput[strip] = 0;
    }
 
   //save cluster main values
@@ -182,8 +202,8 @@ namespace Micromega
   for(UInt_t n(0); n < NumberOfClusters; ++n)
    {
     CreateCluster(Strips_Physical,
-                  ClusterMethod::GAUS,
-                  NoiseMethod::NONE);                  
+                  clustermethod,
+                  noisemethod);
    }
 
   //define multiplexing output
@@ -343,9 +363,45 @@ namespace Micromega
      ReverseMultiplexMAP[strip] = chan;
      mmultiplex.insert(chan, strip) = 1;
     }
+
   mmultiplex.makeCompressed();
   file->Close();
   
+ }
+
+ void ToyDataCreator::InitializeNoiseFromROOTFile(const char* filename, const char* branchname)
+ {
+  //check if it exist
+  const bool ItExist = Utils::FileExist(filename);
+  if(!ItExist)
+   {
+    std::cout << "WARNING: " << " no file with name: " << filename << " building map from algorithm \n";
+    BuildMultiplexingFromAlgorithm();
+    return;
+   }
+  //create root file
+  TFile* file = new TFile(filename, "READ");
+  TTree* tree = (TTree*)file->Get("InfoTree"); //search foir standard tree
+  if(!tree)
+   {
+    std::cout << "WARNING: " << " no tree called InfoTree in file: " << filename << " building map from algorithm \n";
+   }
+
+  //build maps
+  UInt_t NOISE[NumberOfChannels];
+  tree->SetBranchAddress(branchname, NOISE);
+  tree->GetEntry(0);
+
+  //import it in object
+  Noise.reserve(NumberOfChannels);
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
+   {
+    Noise[chan] = NOISE[chan];
+    //Noise[chan] = 0;
+    std::cout << Noise[chan] << " ";
+   }
+  //exit(1);
+  file->Close();  
  }
 
 
