@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
    }
  
   clustree->Branch("ChanOutput",
-                   &StripsOutput,
+                   &ChanOutput,
                    TString::Format("ChanOutputUInt_t[%i]/i",(UInt_t)config->GetNumberOfChannels()));
   clustree->Branch("Strips_Physical",
                    &StripsOutput,
