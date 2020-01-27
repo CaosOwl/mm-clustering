@@ -36,6 +36,7 @@ namespace Config
   myint          GetMPVCharge() const               { return MPVCharge;}
   myfloat        GetSigma() const                   { return Sigma;}
   std::string    GetOutDir() const                  { return outdir;}
+  std::string    GetTargetFile() const              { return targetfile;}
   TString        GetFileNamePath() const            { return outname;}
   //Switches
   bool           MultiplexFromFileSwitch()          { return MultiplexFromFile;}
@@ -61,6 +62,7 @@ namespace Config
   bool      ApplyMinimization;
   
   TString     outname;
+  std::string targetfile;
   std::string outdir;
   
  };

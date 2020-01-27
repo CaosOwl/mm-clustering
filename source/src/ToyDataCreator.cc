@@ -190,7 +190,6 @@ namespace Micromega
   UInt_t chan(0);
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
    {
-    //std::cout << strip << " " << ReverseMultiplexMAP[strip] << " \n";
     Chan[ReverseMultiplexMAP[strip]] += Strips_Physical[strip];
    }   
 
@@ -315,8 +314,38 @@ namespace Micromega
 
  void ToyDataCreator::BuildMultiplexingFromROOTFile(const char* filename)
  {
-  filename = "";
-  return;
+  //check if it exist
+  const bool ItExist = Utils::FileExist(filename);
+  if(!ItExist)
+   {
+    std::cout << "WARNING: " << " no file with name: " << filename << " building map from algorithm \n";
+    BuildMultiplexingFromAlgorithm();
+    return;
+   }
+  //create root file
+  TFile* file = new TFile(filename, "READ");
+  TTree* tree = (TTree*)file->Get("InfoTree"); //search foir standard tree
+  if(!tree)
+   {
+    std::cout << "WARNING: " << " no tree called InfoTree in file: " << filename << " building map from algorithm \n";
+   }
+
+  //build maps
+  UInt_t MAP[NumberOfChannels][MultiplexFactor];
+  tree->SetBranchAddress("MicromegasMap", MAP);
+  tree->GetEntry(0);
+
+  //import it in object
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
+   for(UInt_t mfac(0); mfac < MultiplexFactor; ++mfac)
+    {
+     const UInt_t strip = MAP[chan][mfac];
+     ReverseMultiplexMAP[strip] = chan;
+     mmultiplex.insert(chan, strip) = 1;
+    }
+  mmultiplex.makeCompressed();
+  file->Close();
+  
  }
 
 

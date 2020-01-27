@@ -22,6 +22,7 @@ namespace Config
   MultiplexFromFile         = false;
   SaveWaveforms             = false;
   ApplyMinimization         = false;
+  targetfile                = "dummy";
   outname.Form("ToyCluster_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
                NumberOfChannels,
                MultiplexFactor,
@@ -46,6 +47,7 @@ namespace Config
   configuration.GetOption(Sigma,                 "amplitude"             );
   configuration.GetOption(MPVCharge,             "charge"                );
   configuration.GetOption(outdir,                "outdir"                );
+  configuration.GetOption(targetfile,            "use-file"              );
   //switches
   configuration.GetOption(SaveWaveforms,         "save-waveforms"        );
   configuration.GetOption(MultiplexFromFile,     "from-file"             );
@@ -66,7 +68,11 @@ namespace Config
   std::cout << "\033[1;34 --> Simulating Number Of Clusters: \033[0m \033[1;31m " << NClusters << "\033[0m \n";
   std::cout << "\033[1;34 --> Output set at compression level: \033[0m \033[1;31m " << compression << "\033[0m \n";
 
-  if(!MultiplexFromFile)
+  if(targetfile != "dummy")
+   {
+    std::cout << "--> Attempting to use \033[1;31" << targetfile << " \033[0m to create the multiplex map \n";
+   }
+  else if(!MultiplexFromFile)
    {
     std::cout << "\033[1;34 --> Multiplex map will be built using prime number algorithm: \033[0m \n";
    }

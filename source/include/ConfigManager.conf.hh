@@ -77,6 +77,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,
         {"outdir","string","select destination where to move the outputs","all"}
         ,
+        {"use-file","string","use this file for multiplexing map and noise","all"}
+        ,        
         {"verbose","int","set verbose level","all"}
         ,
         {"channels","int","set number of channels","all"}
@@ -93,7 +95,7 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,
         {"save-waveforms","switch","save all created cluster in histograms","all"}
         ,
-        {"compression","int","compression level of the root file","all"}                
+        {"compression","int","compression level of the root file","all"}
 };
 
 // _.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-.__.-~+*^°^*+~-._

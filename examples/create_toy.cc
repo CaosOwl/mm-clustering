@@ -93,8 +93,16 @@ int main (int argc, char *argv[])
   
   //main creator object
   Micromega::ToyDataCreator* Creator;
-  if(false)
-   return 1;
+  if(Utils::FileExist(config->GetTargetFile()))
+   {
+    const TString targetfile(config->GetTargetFile().c_str());
+    Creator = new Micromega::ToyDataCreator(config->GetNumberOfChannels(),
+                                            config->GetMultiplexFactor(),
+                                            config->GetMPVCharge(),
+                                            config->GetSigma(),
+                                            targetfile
+                                            );
+   }
   else
    {
     const Micromega::MapMethod mapmethod = config->MultiplexFromFileSwitch() ?
@@ -188,6 +196,8 @@ int main (int argc, char *argv[])
   //Print results
   MyTime.Print(std::cout);
 
+  
+  output->cd();
   TTree* timetree = new TTree("time", "time taken by the program");
   MyTime.SaveInTree(timetree);
   //save import parameter in info tree
