@@ -60,39 +60,39 @@ namespace Config
 
   //SUMMARY
   std::cout << "\033[1;34 --> Creating / processing events: \033[0m \033[1;31m "                       << Nevent << "\033[0m \n";
-  std::cout << "\033[1;34 --> Channels: \033[0m \033[1;31m "                 << NumberOfChannels << "\033[0m \n";
-  std::cout << "\033[1;34 --> Multiplex Factor: \033[0m \033[1;31m "         << MultiplexFactor << "\033[0m \n";
-  std::cout << "\033[1;34 --> Strips: \033[0m \033[1;31m "                   << NumberOfStrips << "\033[0m \n";
-  std::cout << "\033[1;34 --> Simulating Clusters: \033[0m \033[1;31m "      << NClusters << "\033[0m \n";  
-  std::cout << "\033[1;34 --> MPV Charge: \033[0m \033[1;31m "               << MPVCharge << "\033[0m \n";
-  std::cout << "\033[1;34 --> Sigma: \033[0m \033[1;31m "                    << Sigma << "\033[0m \n";
-  std::cout << "\033[1;34 --> Simulating Number Of Clusters: \033[0m \033[1;31m " << NClusters << "\033[0m \n";
-  std::cout << "\033[1;34 --> Output set at compression level: \033[0m \033[1;31m " << compression << "\033[0m \n";
+  std::cout << "\033[1;34m --> Channels: \033[0m \033[1;31m "                 << NumberOfChannels << "\033[0m \n";
+  std::cout << "\033[1;34m --> Multiplex Factor: \033[0m \033[1;31m "         << MultiplexFactor << "\033[0m \n";
+  std::cout << "\033[1;34m --> Strips: \033[0m \033[1;31m "                   << NumberOfStrips << "\033[0m \n";
+  std::cout << "\033[1;34m --> Simulating Clusters: \033[0m \033[1;31m "      << NClusters << "\033[0m \n";  
+  std::cout << "\033[1;34m --> MPV Charge: \033[0m \033[1;31m "               << MPVCharge << "\033[0m \n";
+  std::cout << "\033[1;34m --> Sigma: \033[0m \033[1;31m "                    << Sigma << "\033[0m \n";
+  std::cout << "\033[1;34m --> Simulating Number Of Clusters: \033[0m \033[1;31m " << NClusters << "\033[0m \n";
+  std::cout << "\033[1;34m --> Output set at compression level: \033[0m \033[1;31m " << compression << "\033[0m \n";
 
   if(targetfile != "dummy")
    {
-    std::cout << "--> Attempting to use \033[1;31" << targetfile << " \033[0m to create the multiplex map \n";
+    std::cout << "--> Attempting to use \033[1;31m" << targetfile << " \033[0m to create the multiplex map \n";
     UseUserFile = true;
    }
   else if(!MultiplexFromFile)
    {
-    std::cout << "\033[1;34 --> Multiplex map will be built using prime number algorithm: \033[0m \n";
+    std::cout << "\033[1;34m --> Multiplex map will be built using prime number algorithm: \033[0m \n";
    }
   else
    {
-    std::cout << "\033[1;34 --> Multiplex map will be built from file: \033[0m \n";
+    std::cout << "\033[1;34m --> Multiplex map will be built from file: \033[0m \n";
    }
   if(SaveWaveforms)
    {
-    std::cout << "\033[1;34 --> All waveforms will be saved in histograms: \033[0m \n";
+    std::cout << "\033[1;34m --> All waveforms will be saved in histograms: \033[0m \n";
    }
   if(ApplyMinimization)
    {
-    std::cout << "\033[1;34 --> All will be minimized before storing: \033[0m \n";
+    std::cout << "\033[1;34m --> All will be minimized before storing: \033[0m \n";
    }
     
   //CreateOutDirectory();
-  std::cout << "\033[1;34 --> Result will be saved in directory: \033[0m \033[1;31m " << outdir << "\033[0m \n";
+  std::cout << "\033[1;34m --> Result will be saved in directory: \033[0m \033[1;31m " << outdir << "\033[0m \n";
 
   return true;
  
