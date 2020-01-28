@@ -36,6 +36,7 @@ namespace Config
   myint          GetNumberOfStrips() const          { return NumberOfStrips;}
   myint          GetMPVCharge() const               { return MPVCharge;}
   myfloat        GetSigma() const                   { return Sigma;}
+  myfloat        GetMinimalDistance() const         { return MinimalDistance;}
   std::string    GetOutDir() const                  { return outdir;}
   std::string    GetTargetFile() const              { return targetfile;}
   TString        GetFileNamePath() const            { return outname;}
@@ -58,6 +59,7 @@ namespace Config
   myint     NumberOfStrips;
   myint     MPVCharge;
   myfloat   Sigma;
+  myfloat   MinimalDistance;
   //switches
   bool      MultiplexFromFile;
   bool      UseUserFile;

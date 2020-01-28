@@ -122,14 +122,13 @@ namespace Micromega
 
 
  void ToyDataCreator::CreateCluster(UInt_t* StripsOutput,
+                                    const Double_t clusterposition,
                                     const ClusterMethod clusmethod,
                                     const NoiseMethod noisemethod)
  {
-  //throw random values for all relevant output of a cluster
-  const Double_t clusterposition    = gRandom->Uniform(0, NumberOfStrips);
   const Double_t clustersigma       = gRandom->Poisson(Sigma);
-  const UInt_t   clustertotalcharge = gRandom->Landau(MPVCharge, 20); //SSigma currently based on MM3 x plane
-
+  const UInt_t   clustertotalcharge = gRandom->Landau(MPVCharge, 20); //SSigma currently based on MM3 x plane    
+  
   //create actual gaussian
   switch(clusmethod)
    {
@@ -197,7 +196,8 @@ namespace Micromega
                                   UInt_t* Strips_Physical,
                                   Double_t* Strips_Processed,
                                   const UInt_t NumberOfClusters,
-                                  const bool DoMinimization)
+                                  const bool DoMinimization,
+                                  const Double_t minimaldistance)
  {
 
   //reset variables
@@ -209,9 +209,23 @@ namespace Micromega
   Clear();
 
   //create desidered number of gausian
+  Double_t clusterposition(-1);
   for(UInt_t n(0); n < NumberOfClusters; ++n)
    {
+    //throw random values for all relevant output of a cluster    
+    if(minimaldistance < 0 || clusterposition < 0)
+     {
+      clusterposition = gRandom->Uniform(0, NumberOfStrips);
+     }
+    else
+     {
+      clusterposition = gRandom->Uniform(clusterposition - minimaldistance, clusterposition + minimaldistance);
+      while(clusterposition < 0 || clusterposition > NumberOfStrips)
+       clusterposition = gRandom->Uniform(clusterposition - minimaldistance, clusterposition + minimaldistance);
+     }
+    
     CreateCluster(Strips_Physical,
+                  clusterposition,
                   clustermethod,
                   noisemethod);
    }
@@ -416,6 +430,28 @@ namespace Micromega
    }
   //exit(1);
   file->Close();  
+ }
+
+ std::vector<UInt_t> ToyDataCreator::CreateMultiplexedStrips(UInt_t* Chan) const
+ {
+  std::vector<UInt_t> STRIPS;
+  STRIPS.reserve(NumberOfStrips);
+  for(UInt_t strip(0); strip < NumberOfStrips; ++strip)STRIPS[strip] = Chan[ReverseMultiplexMAP[strip]];
+
+  return STRIPS;
+                                                                            
+ }
+
+ bool ToyDataCreator::IsStripValid(const UInt_t* Chan, const UInt_t strip, const UInt_t noisesigma) const
+ {
+  const bool prestripvalid =  strip == 0 ? false : (Chan[ReverseMultiplexMAP[strip - 1]] > noisesigma*Noise[ReverseMultiplexMAP[strip]]);
+  const bool poststripvalid =  strip == (NumberOfStrips-1) ? false : (Chan[ReverseMultiplexMAP[strip + 1]] > noisesigma*Noise[ReverseMultiplexMAP[strip]]);
+  const bool stripvalid = Chan[ReverseMultiplexMAP[strip]] > Noise[ReverseMultiplexMAP[strip]];
+
+  const bool isvalid = stripvalid && (prestripvalid || poststripvalid);
+  
+
+  return isvalid;
  }
 
 

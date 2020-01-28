@@ -19,7 +19,7 @@ namespace Micromega
   ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const MapMethod mapmethod = ALGO);
   ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const TString filename);
  
-  bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true);
+  bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true, const Double_t minimaldistance = -1);
 
   //set functions
 
@@ -62,7 +62,7 @@ namespace Micromega
   void FillRegMatrix();
   void FillMultiplexingMatrix(const MapMethod);
   void FillData(const UInt_t);
-  void CreateCluster(UInt_t*, const ClusterMethod = GAUS, const NoiseMethod = NONE);
+  void CreateCluster(UInt_t*, const Double_t, const ClusterMethod = GAUS, const NoiseMethod = NONE);
   void Clear();
 
   //building multiplexing mapping

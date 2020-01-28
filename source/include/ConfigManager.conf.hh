@@ -91,6 +91,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,
         {"amplitude","double","set amplitude of clusters in sigma","all"}
         ,
+        {"min-distance","double","set minimal distance between clusters in strip size","all"}
+        ,        
         {"from-file","switch","take multiplex map from file","all"}
         ,
         {"save-waveforms","switch","save all created cluster in histograms","all"}

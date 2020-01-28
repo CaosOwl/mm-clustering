@@ -137,7 +137,8 @@ int main (int argc, char *argv[])
                          StripsOutput,
                          StripsOutputProcessed,
                          config->GetNClusters(),          //number of clusters to generate
-                         config->MinimizationSwitch());   //If minimization procedure must be applied or not
+                         config->MinimizationSwitch(),   //If minimization procedure must be applied or not
+                         config->GetMinimalDistance());     //minimal distance between the clusters
 
     //assign true
     for(UInt_t j(0);j < config->GetNClusters();++j)

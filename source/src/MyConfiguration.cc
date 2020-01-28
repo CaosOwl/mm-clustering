@@ -19,6 +19,7 @@ namespace Config
   NumberOfStrips            = MultiplexFactor * NumberOfChannels;
   MPVCharge                 = 100;
   Sigma                     = 3;
+  MinimalDistance           = -1;
   MultiplexFromFile         = false;
   SaveWaveforms             = false;
   ApplyMinimization         = false;
@@ -46,6 +47,7 @@ namespace Config
   configuration.GetOption(MultiplexFactor,       "mfactor"               );
   configuration.GetOption(NClusters,             "nclusters"             );   
   configuration.GetOption(Sigma,                 "amplitude"             );
+  configuration.GetOption(MinimalDistance,       "min-distance"          );
   configuration.GetOption(MPVCharge,             "charge"                );
   configuration.GetOption(outdir,                "outdir"                );
   configuration.GetOption(targetfile,            "use-file"              );
@@ -90,6 +92,10 @@ namespace Config
    {
     std::cout << "\033[1;34m --> All will be minimized before storing: \033[0m \n";
    }
+  if(MinimalDistance > 0)
+   {
+    std::cout << "\033[1;34m --> Minimal distance between clusters will be: \033[0m \033[1;31m" << MinimalDistance << " strips\033[0m \n";
+   }   
     
   //CreateOutDirectory();
   std::cout << "\033[1;34m --> Result will be saved in directory: \033[0m \033[1;31m " << outdir << "\033[0m \n";
