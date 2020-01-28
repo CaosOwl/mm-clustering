@@ -1,0 +1,15 @@
+notify_user = <usermail>
+# Never, Error, Complete, Always
+notification = <notification>
+
+JOBNAME = <jobname>
+output = <logdirectory>/output/$(JOBNAME).$(ClusterId).$(ProcId).out
+error = <logdirectory>/error/$(JOBNAME).$(ClusterId).$(ProcId).err
+log = <logdirectory>/log/$(JOBNAME).$(ClusterId).log
+
+executable = exec.sh 
+
+arguments = $(JOBNAME)_$(ClusterId)_$(ProcId)
+
+queue <jobsnumber>
+
