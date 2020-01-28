@@ -22,6 +22,7 @@ namespace Micromega
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
   Sigma(Sigma_),
+  verbose(0),
   noisemethod(NoiseMethod::NONE),
   clustermethod(ClusterMethod::GAUS)
  {
@@ -62,6 +63,7 @@ namespace Micromega
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
   Sigma(Sigma_),
+  verbose(0),
   noisemethod(NoiseMethod::NONE),
   clustermethod(ClusterMethod::GAUS)
  {
@@ -225,15 +227,22 @@ namespace Micromega
    {
     //Solve the numericalproblem
     for(UInt_t chan(0); chan < NumberOfChannels; ++chan)data_v.push_back(Chan[chan]);
-    std::cout << "before minimization \n";
-    Strips_Processed = NumericalMinimization(2);
-    std::cout << "after minimization \n";
+    NumericalMinimization(Strips_Processed, verbose);
    }
   else
    {
-    //simply apply multiplexing
+    //Apply multiplexing, remove noise and remove single strips
     for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
-     Strips_Processed[strip] = Chan[ReverseMultiplexMAP[strip]];
+     {
+      if(IsStripValid(Chan, strip))
+       {
+        Strips_Processed[strip] = Chan[ReverseMultiplexMAP[strip]];        
+       }
+       else
+        {
+         Strips_Processed[strip] = 0;
+        }
+       }
    }
 
   return true;

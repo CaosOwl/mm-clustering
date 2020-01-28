@@ -112,6 +112,8 @@ int main (int argc, char *argv[])
                                             mapmethod
                                             );
    }
+  //set verbose
+  Creator->SetVerbose(config->GetVerbose());
 
   //Histograms
   output->cd();
@@ -148,11 +150,17 @@ int main (int argc, char *argv[])
     //save histogram
     if(config->SaveWaveformsSwitch())
      {
+      std::vector<UInt_t> Strips_Multiplexed = Creator->CreateMultiplexedStrips(ChanOutput);
       TString foldername;
       foldername.Form("histograms/event_%i", i);
       output->mkdir(foldername);output->cd(foldername);
       TH1F* stripsphys = new TH1F(TString::Format("stripsphys_evt_%i", i),
                                   TString::Format("strip physical for event %i", i),
+                                  config->GetNumberOfStrips(),
+                                  -0.5,
+                                  config->GetNumberOfStrips() -0.5);
+      TH1F* stripsmultiplexed = new TH1F(TString::Format("stripsmultiplexed_evt_%i", i),
+                                  TString::Format("strip multiplexedical for event %i", i),
                                   config->GetNumberOfStrips(),
                                   -0.5,
                                   config->GetNumberOfStrips() -0.5);
@@ -166,11 +174,12 @@ int main (int argc, char *argv[])
                                  config->GetNumberOfChannels(),
                                  -0.5,
                                  config->GetNumberOfChannels() -0.5);
+
       //fill it      
-      for(UInt_t n(0); n < config->GetNumberOfStrips(); ++n){stripsphys->SetBinContent(n, StripsOutput[n]);stripsreco->SetBinContent(n, StripsOutputProcessed[n]);}
+      for(UInt_t n(0); n < config->GetNumberOfStrips(); ++n){stripsphys->SetBinContent(n, StripsOutput[n]);stripsmultiplexed->SetBinContent(n, Strips_Multiplexed[n]);stripsreco->SetBinContent(n, StripsOutputProcessed[n]);}
       for(UInt_t n(0); n < config->GetNumberOfChannels(); ++n)chanout->SetBinContent(n, ChanOutput[n]);
             
-      stripsphys->Write();stripsreco->Write();chanout->Write();
+      stripsmultiplexed->Write();stripsphys->Write();stripsreco->Write();chanout->Write();
       output->cd();       
      }
     

@@ -66,7 +66,10 @@ double LogLikelihood(const double *pars )
 }
 
 
-inline Double_t* NumericalMinimization(UInt_t mode, UInt_t verbose = 0)
+inline void NumericalMinimization(Double_t* solution,
+                                  UInt_t verbose = 0,
+                                  UInt_t maxiteration = 50,
+                                  UInt_t maxfunccall  = 8e+05 )
 {
  // GSL Simulated Annealing minimizer
  //   ROOT::Math::GSLSimAnMinimizer min;
@@ -87,7 +90,7 @@ inline Double_t* NumericalMinimization(UInt_t mode, UInt_t verbose = 0)
  std::cout << "Eigen threads: " << n << std::endl;  
 
  ROOT::Math::Minimizer* min = NULL;
- if(mode == 1){
+ if(false){
   //        min =   ROOT::Math::Factory::CreateMinimizer("GSLMultiMin", "SteepestDescent");
   //            min =   ROOT::Math::Factory::CreateMinimizer("GSLSimAn", "");
   //      min =        ROOT::Math::Factory::CreateMinimizer("Minuit2", "kSimplex");
@@ -99,13 +102,11 @@ inline Double_t* NumericalMinimization(UInt_t mode, UInt_t verbose = 0)
   min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
   //gErrorIgnoreLevel = 1001; 
   min->SetPrintLevel(verbose);
-  min->SetMaxIterations(50);
+  min->SetMaxIterations(maxiteration);
   //   min->SetTolerance(30000);
-  min->SetMaxFunctionCalls(8e+05);
+  min->SetMaxFunctionCalls(maxfunccall);
  }
   
-
- std::cout << "Before functor: " << n << std::endl;  
  ROOT::Math::Functor f(&LogLikelihood,NStrips); 
  double step[NStrips];
  for(UInt_t i = 0; i < NStrips; i++){
@@ -125,12 +126,9 @@ inline Double_t* NumericalMinimization(UInt_t mode, UInt_t verbose = 0)
   min->SetVariableLimits(i, 0, 1e+04);
  } 
 
- std::cout << "Before minimization: " << n << std::endl;  
  min->Minimize(); 
- Double_t *solution = (Double_t*)min->X();
- std::cout << "After minimization: " << n << std::endl;  
+ for(UInt_t s(0); s < NStrips; ++s)solution[s] = min->X()[s];
  
  delete min;
 
- return solution;	
 }

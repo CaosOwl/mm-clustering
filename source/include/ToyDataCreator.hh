@@ -31,10 +31,13 @@ namespace Micromega
   //set functions
   void SetNoiseMethod  (const NoiseMethod method){noisemethod = method;}
   void SetClusterMethod(const ClusterMethod method){clustermethod = method;}
+  void SetVerbose(const UInt_t v){verbose = v;}
 
   //utilities
   void SaveParameterInTree(TTree*) const;
   void InitializeNoiseFromROOTFile(const char*, const char* branchname = "MM3X_sigma");
+  std::vector<UInt_t> CreateMultiplexedStrips(UInt_t*) const;
+  bool IsStripValid(const UInt_t*, const UInt_t,const UInt_t noisesigma = 2) const;
 
  private:
   //Fundamental parameters
@@ -43,6 +46,7 @@ namespace Micromega
   UInt_t NumberOfStrips;
   UInt_t MPVCharge;
   double Sigma;
+  UInt_t verbose;
   NoiseMethod   noisemethod;
   ClusterMethod clustermethod;
   //mapping
