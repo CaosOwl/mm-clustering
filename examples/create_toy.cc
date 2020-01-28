@@ -59,7 +59,7 @@ int main (int argc, char *argv[])
   //fix the branches
   UInt_t ChanOutput[config->GetNumberOfChannels()];
   UInt_t StripsOutput[config->GetNumberOfStrips()];
-  UInt_t StripsOutputProcessed[config->GetNumberOfStrips()];
+  Double_t StripsOutputProcessed[config->GetNumberOfStrips()];
   Double_t TruePositions[5];
   Double_t Sigmas[5];
   UInt_t   Charges[5];
@@ -79,7 +79,7 @@ int main (int argc, char *argv[])
                    TString::Format("Strips_PhysicalUInt_t[%i]/i", (UInt_t)config->GetNumberOfStrips()));
   clustree->Branch("Strips_Processed",
                    &StripsOutputProcessed,
-                   TString::Format("Strips_ProcessedUInt_t[%i]/i", (UInt_t)config->GetNumberOfStrips()));
+                   TString::Format("Strips_ProcessedDouble_t[%i]/D", (UInt_t)config->GetNumberOfStrips()));
   clustree->Branch("TruePosition", &TruePositions, "TruePositionDouble_t[5]/D");
   clustree->Branch("Sigma",        &Sigmas,        "SigmaDouble_t[5]/d");
   clustree->Branch("Charge",       &Charges,       "ChargeUInt_t[5]/i");

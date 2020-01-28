@@ -185,14 +185,14 @@ namespace Micromega
 
  bool ToyDataCreator::GenerateToy(UInt_t* Chan,
                                   UInt_t* Strips_Physical,
-                                  UInt_t* Strips_Processed,
+                                  Double_t* Strips_Processed,
                                   const UInt_t NumberOfClusters,
                                   const bool DoMinimization)
  {
 
   //reset variables
   for(UInt_t chan(0); chan < NumberOfChannels; ++chan)Chan[chan] = 0;
-  for(UInt_t strip(0); strip < NumberOfStrips; ++strip){Strips_Physical[strip] = 0;Strips_Processed[strip] = 0;}
+  for(UInt_t strip(0); strip < NumberOfStrips; ++strip){Strips_Physical[strip] = 0;Strips_Processed[strip] = 0.;}
 
 
   //clear vectors

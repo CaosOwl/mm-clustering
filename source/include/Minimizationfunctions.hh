@@ -66,7 +66,7 @@ double LogLikelihood(const double *pars )
 }
 
 
-inline UInt_t* NumericalMinimization(UInt_t mode)
+inline Double_t* NumericalMinimization(UInt_t mode, UInt_t verbose = 0)
 {
  // GSL Simulated Annealing minimizer
  //   ROOT::Math::GSLSimAnMinimizer min;
@@ -98,7 +98,7 @@ inline UInt_t* NumericalMinimization(UInt_t mode)
 
   min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
   //gErrorIgnoreLevel = 1001; 
-  min->SetPrintLevel(0);
+  min->SetPrintLevel(verbose);
   min->SetMaxIterations(50);
   //   min->SetTolerance(30000);
   min->SetMaxFunctionCalls(8e+05);
@@ -127,7 +127,7 @@ inline UInt_t* NumericalMinimization(UInt_t mode)
 
  std::cout << "Before minimization: " << n << std::endl;  
  min->Minimize(); 
- UInt_t *solution = (UInt_t*)min->X();
+ Double_t *solution = (Double_t*)min->X();
  std::cout << "After minimization: " << n << std::endl;  
  
  delete min;
