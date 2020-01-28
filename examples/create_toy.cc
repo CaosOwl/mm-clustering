@@ -201,7 +201,7 @@ int main (int argc, char *argv[])
   //save import parameter in info tree
   TTree* infotree = new TTree("InfoTree", "Parameter used for the toy");
   config->SaveParamterInTree(infotree);
-  Creator->SaveMultiplexMapToTree(infotree);
+  Creator->SaveParameterInTree(infotree);
   //write to file
   clustree->Write();
   timetree->Write();

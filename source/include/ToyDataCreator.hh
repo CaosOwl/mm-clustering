@@ -33,7 +33,7 @@ namespace Micromega
   void SetClusterMethod(const ClusterMethod method){clustermethod = method;}
 
   //utilities
-  void SaveMultiplexMapToTree(TTree*) const;
+  void SaveParameterInTree(TTree*) const;
   void InitializeNoiseFromROOTFile(const char*, const char* branchname = "MM3X_sigma");
 
  private:

@@ -42,6 +42,10 @@ namespace Micromega
   //reverse multiplex map
   ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
 
+  //reserve noise
+  Noise.reserve(NumberOfChannels);
+  for(UInt_t n(0); n < NumberOfChannels; ++n)Noise[n] = 0;
+
   //initialize maps
   FillRegMatrix();
   FillMultiplexingMatrix(mapmethod);                  
@@ -77,6 +81,10 @@ namespace Micromega
   MFac    = MultiplexFactor;
   //reverse multiplex map
   ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
+
+  //reserve noise
+  Noise.reserve(NumberOfChannels);
+  for(UInt_t n(0); n < NumberOfChannels; ++n)Noise[n] = 0;
 
   //initialize maps
   FillRegMatrix();
@@ -393,12 +401,9 @@ namespace Micromega
   tree->GetEntry(0);
 
   //import it in object
-  Noise.reserve(NumberOfChannels);
   for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
    {
     Noise[chan] = NOISE[chan];
-    //Noise[chan] = 0;
-    std::cout << Noise[chan] << " ";
    }
   //exit(1);
   file->Close();  
@@ -445,18 +450,23 @@ namespace Micromega
    }
  }
 
- void ToyDataCreator::SaveMultiplexMapToTree(TTree* tree) const
+ void ToyDataCreator::SaveParameterInTree(TTree* tree) const
  {
   UInt_t MicromegasMap[NumberOfChannels][MultiplexFactor];
+  UInt_t NOISE[NumberOfChannels];
   tree->Branch("MicromegasMap", &MicromegasMap, TString::Format("MicromegasMapint[%i][%i]/i", NumberOfChannels, MultiplexFactor));
+  tree->Branch("Noise", &NOISE, TString::Format("Noise[%i]/i", NumberOfChannels));  
   for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
-   for(UInt_t mfac(0); mfac < MultiplexFactor; ++mfac)
-    {
+   {
+    NOISE[chan] = Noise[chan];
+    for(UInt_t mfac(0); mfac < MultiplexFactor; ++mfac)
+     {
      //find strip, (very inefficient)
-     UInt_t strip(0);
-     while(ReverseMultiplexMAP[strip] != chan)++strip;
-     MicromegasMap[chan][mfac] = strip;
-    }
+      UInt_t strip(0);
+      while(ReverseMultiplexMAP[strip] != chan)++strip;
+      MicromegasMap[chan][mfac] = strip;
+     }
+   }
 
   //fill it
   tree->Fill();
