@@ -23,6 +23,7 @@ namespace Config
   
   //ACCESSORIES
   bool CreateOutDirectory();
+  TString CreateOutputName(const char*) const;
   bool SaveParamterInTree(TTree*);
 
   //GET FUNCTIONS

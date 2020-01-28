@@ -124,6 +124,24 @@ namespace Config
   return true;
   
  }
- 
+
+  TString MyConfiguration::CreateOutputName(const char* header) const
+ {
+  TString outname;
+
+  outname.Form("%s%i_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
+               header,
+               NClusters,
+               NumberOfChannels,
+               MultiplexFactor,
+               MPVCharge,
+               Sigma
+               );
+
+  //minimization applied
+  if(ApplyMinimization) outname += "_minimized";
+
+  return outname;
+ }
 
 }//END NAMESPACE CONFIG

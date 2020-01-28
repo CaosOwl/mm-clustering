@@ -50,13 +50,7 @@ int main (int argc, char *argv[])
   
 
   //Define outputs
-  TString outputname;
-  outputname.Form("ToyCluster%i_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
-                  config->GetNClusters(),
-                  config->GetNumberOfChannels(),
-                  config->GetMultiplexFactor(),
-                  config->GetMPVCharge(),
-                  config->GetSigma());  
+  TString outputname = config->CreateOutputName("ToyCluster");
 
   TFile* output = new TFile(outputname +".root", "RECREATE");  
   output->SetCompressionSettings(config->GetCompressionLevel());
