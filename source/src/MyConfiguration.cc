@@ -123,6 +123,8 @@ namespace Config
   Utils::AddParameterToList(list, "Sigma",            Sigma);
   Utils::AddParameterToList(list, "NClusters",        NClusters);
   Utils::AddParameterToList(list, "Minimization",     ApplyMinimization);
+  if(MinimalDistance > 0)
+   Utils::AddParameterToList(list, "MinimalDistance", MinimalDistance);
 
   //add to user info
   Utils::AddInfoParameters(tree, list);
@@ -146,6 +148,10 @@ namespace Config
 
   //minimization applied
   if(ApplyMinimization) outname += "_minimized";
+
+  //minimal distance
+  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);
+  
 
   return outname;
  }
