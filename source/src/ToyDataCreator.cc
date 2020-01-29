@@ -235,31 +235,30 @@ namespace Micromega
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
    {
     Chan[ReverseMultiplexMAP[strip]] += Strips_Physical[strip];
-   }   
+   }
+  
+  //Apply multiplexing, remove noise and remove single strips
+  for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
+   {
+    if(IsStripValid(Chan, strip))
+     {
+      Strips_Processed[strip] = Chan[ReverseMultiplexMAP[strip]];
+     }
+    else
+     {
+      Strips_Processed[strip] = 0;
+     }
+   }
 
+  //do minimization if required
   if(DoMinimization)
    {
     //Solve the numericalproblem
     for(UInt_t chan(0); chan < NumberOfChannels; ++chan)data_v.push_back(Chan[chan]);
     NumericalMinimization(Strips_Processed, verbose);
    }
-  else
-   {
-    //Apply multiplexing, remove noise and remove single strips
-    for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
-     {
-      if(IsStripValid(Chan, strip))
-       {
-        Strips_Processed[strip] = Chan[ReverseMultiplexMAP[strip]];        
-       }
-       else
-        {
-         Strips_Processed[strip] = 0;
-        }
-       }
-   }
-
-  return true;
+    
+    return true;
   
   
   
