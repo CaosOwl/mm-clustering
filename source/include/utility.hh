@@ -104,7 +104,7 @@ namespace Utils
    }
   return false;
  }
-
+ 
  inline double GetParameter(TList* list,const char* parname, const uint Verbose = 0)
  {
   TParameter<double>* par = (TParameter<double>*)list->FindObject(parname);
@@ -112,6 +112,20 @@ namespace Utils
    {
     std::cerr << "parameter with name: " << parname << " not found in the list \n";
     return -9999.;
+   }
+  else
+   {
+    return par->GetVal();
+   }
+ }
+
+ inline UInt_t GetIntParameter(TList* list,const char* parname, const uint Verbose = 0)
+ {
+  TParameter<UInt_t>* par = (TParameter<UInt_t>*)list->FindObject(parname);
+  if(!par)
+   {
+    std::cerr << "parameter with name: " << parname << " not found in the list \n";
+    return 9999;
    }
   else
    {

@@ -23,6 +23,7 @@ namespace Micromega
   MPVCharge(MPVCharge_),
   Sigma(Sigma_),
   verbose(0),
+  LambdaMin(1.),
   noisemethod(NoiseMethod::NONE),
   clustermethod(ClusterMethod::GAUS)
  {
@@ -64,6 +65,7 @@ namespace Micromega
   MPVCharge(MPVCharge_),
   Sigma(Sigma_),
   verbose(0),
+  LambdaMin(1.),  
   noisemethod(NoiseMethod::NONE),
   clustermethod(ClusterMethod::GAUS)
  {
@@ -255,7 +257,7 @@ namespace Micromega
    {
     //Solve the numericalproblem
     for(UInt_t chan(0); chan < NumberOfChannels; ++chan)data_v.push_back(Chan[chan]);
-    NumericalMinimization(Strips_Processed, verbose);
+    NumericalMinimization(Strips_Processed, verbose, LambdaMin);
    }
     
     return true;

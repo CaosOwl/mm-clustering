@@ -114,6 +114,8 @@ int main (int argc, char *argv[])
    }
   //set verbose
   Creator->SetVerbose(config->GetVerbose());
+  //set minimization parameter
+  if(config->MinimizationSwitch())Creator->SetLambda(config->GetLambdaMin());
 
   //Histograms
   output->cd();

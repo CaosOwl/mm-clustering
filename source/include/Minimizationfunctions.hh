@@ -26,6 +26,7 @@ std::vector<double> data_v;// channel values data
 UInt_t NStrips; //strips number
 UInt_t NChan;   // channel number
 UInt_t MFac;    //multiplexing factor
+Double_t lambda;
 
 
 //Matricesx
@@ -60,7 +61,7 @@ double LogLikelihood(const double *pars )
  mQ2 = mreg * vstrips;
  mQ2T = mQ2.transpose();
  ms = mQ2T * mQ2;
- logl += ms(0,0);
+ logl += lambda*lambda*ms(0,0);
   
  return logl;
 }
@@ -68,8 +69,10 @@ double LogLikelihood(const double *pars )
 
 inline void NumericalMinimization(Double_t* solution,
                                   UInt_t verbose = 0,
+                                  Double_t mylambda = 1.,
                                   UInt_t maxiteration = 50,
-                                  UInt_t maxfunccall  = 8e+05 )
+                                  UInt_t maxfunccall  = 8e+05
+                                  )
 {
  // GSL Simulated Annealing minimizer
  //   ROOT::Math::GSLSimAnMinimizer min;
@@ -84,6 +87,10 @@ inline void NumericalMinimization(Double_t* solution,
  // Choose method upon creation between:
  // kMigrad, kSimplex, kCombined, 
  // kScan, kFumili
+
+ //Assign lambda
+ lambda = mylambda;
+ 
  Eigen::setNbThreads(8);
 
  UInt_t n = Eigen::nbThreads();

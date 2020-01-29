@@ -20,6 +20,7 @@ namespace Config
   MPVCharge                 = 100;
   Sigma                     = 3;
   MinimalDistance           = -1;
+  LambdaMin                 = 1;
   MultiplexFromFile         = false;
   SaveWaveforms             = false;
   ApplyMinimization         = false;
@@ -48,6 +49,7 @@ namespace Config
   configuration.GetOption(NClusters,             "nclusters"             );   
   configuration.GetOption(Sigma,                 "amplitude"             );
   configuration.GetOption(MinimalDistance,       "min-distance"          );
+  configuration.GetOption(LambdaMin,             "lambda-min"            );
   configuration.GetOption(MPVCharge,             "charge"                );
   configuration.GetOption(outdir,                "outdir"                );
   configuration.GetOption(targetfile,            "use-file"              );
@@ -147,10 +149,10 @@ namespace Config
                );
 
   //minimization applied
-  if(ApplyMinimization) outname += "_minimized";
+  if(ApplyMinimization) outname += TString::Format("_minimizedLambda%0.2f",LambdaMin);
 
   //minimal distance
-  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);  
+  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);
 
   return outname;
  }

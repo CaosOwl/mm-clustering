@@ -92,6 +92,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         {"amplitude","double","set amplitude of clusters in sigma","all"}
         ,
         {"min-distance","double","set minimal distance between clusters in strip size","all"}
+        ,
+        {"lambda-min","double","lambda used for the minimization function","all"}        
         ,        
         {"from-file","switch","take multiplex map from file","all"}
         ,

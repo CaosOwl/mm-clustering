@@ -32,6 +32,7 @@ namespace Micromega
   void SetNoiseMethod  (const NoiseMethod method){noisemethod = method;}
   void SetClusterMethod(const ClusterMethod method){clustermethod = method;}
   void SetVerbose(const UInt_t v){verbose = v;}
+  void SetLambda(const UInt_t l){LambdaMin = l;}
 
   //utilities
   void SaveParameterInTree(TTree*) const;
@@ -47,6 +48,7 @@ namespace Micromega
   UInt_t MPVCharge;
   double Sigma;
   UInt_t verbose;
+  Double_t LambdaMin;
   NoiseMethod   noisemethod;
   ClusterMethod clustermethod;
   //mapping

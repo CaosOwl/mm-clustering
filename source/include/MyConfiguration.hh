@@ -37,6 +37,7 @@ namespace Config
   myint          GetMPVCharge() const               { return MPVCharge;}
   myfloat        GetSigma() const                   { return Sigma;}
   myfloat        GetMinimalDistance() const         { return MinimalDistance;}
+  myfloat        GetLambdaMin() const               { return LambdaMin;}
   std::string    GetOutDir() const                  { return outdir;}
   std::string    GetTargetFile() const              { return targetfile;}
   TString        GetFileNamePath() const            { return outname;}
@@ -44,7 +45,7 @@ namespace Config
   bool           MultiplexFromFileSwitch()          { return MultiplexFromFile;}
   bool           SaveWaveformsSwitch()              { return SaveWaveforms;}
   bool           MinimizationSwitch()               { return ApplyMinimization;}
-  bool           UserFileSwitch()                   { return UseUserFile;}  
+  bool           UserFileSwitch()                   { return UseUserFile;}
 
  private:
   //CONFIGURATION
@@ -60,6 +61,7 @@ namespace Config
   myint     MPVCharge;
   myfloat   Sigma;
   myfloat   MinimalDistance;
+  myfloat   LambdaMin;
   //switches
   bool      MultiplexFromFile;
   bool      UseUserFile;
