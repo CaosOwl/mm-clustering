@@ -150,8 +150,7 @@ namespace Config
   if(ApplyMinimization) outname += "_minimized";
 
   //minimal distance
-  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);
-  
+  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);  
 
   return outname;
  }
