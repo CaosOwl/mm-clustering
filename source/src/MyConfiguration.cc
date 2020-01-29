@@ -61,7 +61,7 @@ namespace Config
 
 
   //SUMMARY
-  std::cout << "\033[1;34 --> Creating / processing events: \033[0m \033[1;31m "                       << Nevent << "\033[0m \n";
+  std::cout << "\033[1;34m --> Creating / processing events: \033[0m \033[1;31m "                       << Nevent << "\033[0m \n";
   std::cout << "\033[1;34m --> Channels: \033[0m \033[1;31m "                 << NumberOfChannels << "\033[0m \n";
   std::cout << "\033[1;34m --> Multiplex Factor: \033[0m \033[1;31m "         << MultiplexFactor << "\033[0m \n";
   std::cout << "\033[1;34m --> Strips: \033[0m \033[1;31m "                   << NumberOfStrips << "\033[0m \n";
