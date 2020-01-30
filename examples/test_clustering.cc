@@ -26,7 +26,7 @@ using namespace TMVA;
 
 //globals
 const char* treename     = "ClusterTree";
-const char* infotreename = "InfoTreeRun";
+const char* infotreename = "InfoTree";
 
 
 int main (int argc, char *argv[])
@@ -81,10 +81,11 @@ int main (int argc, char *argv[])
   output->mkdir(PlaneDir + "-selected");
 
   //Histograms
-  TH1F* Amplitude = new TH1F("Amplitude", "Amplitude of the Clusters; signal output", 1000, 0, 4000);
-  TH1F* SigmaOut  = new TH1F("Sigma",     "Sigma of the Clusters; sigma [strips]",    15, 0, 15);
-  TH1F* NCluster  = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);
-  TH1F* chi2      = new TH1F("chi2",      "$chi^2 of the fit; #chi^2",                1000, 0, 10);
+  TH2F* AmpvsSigma = new TH2F("AmpvsSigma", "Amplitude of the Clusters vs Sigma of the clusters; signal output; sigma [strips]",
+                              1000, 0, 4000,
+                              15, -0.5, 14.5);
+  TH1F* NCluster   = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);
+  TH1F* chi2       = new TH1F("chi2",      "$chi^2 of the fit; #chi^2",                1000, 0, 10);
 
   //Create new random number generator
   gRandom = new TRandom2(time(0));
@@ -118,8 +119,7 @@ int main (int argc, char *argv[])
       planehist->Write();      
       output->cd();
 
-      Amplitude->Fill(plane.GetAmplitude());
-      SigmaOut->Fill(plane.GetSigma());
+      AmpvsSigma->Fill(plane.GetAmplitude(), plane.GetSigma());
       NCluster->Fill(plane.GetNPeaks());
       chi2->Fill(plane.GetChi2());
 
