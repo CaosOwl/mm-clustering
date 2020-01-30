@@ -21,8 +21,6 @@ namespace Micromega
  
   bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true, const Double_t minimaldistance = -1);
 
-  //set functions
-
   //get functions
   Double_t GetPosition(UInt_t index);
   Double_t GetSigma(UInt_t index);
@@ -33,12 +31,14 @@ namespace Micromega
   void SetClusterMethod(const ClusterMethod method){clustermethod = method;}
   void SetVerbose(const UInt_t v){verbose = v;}
   void SetLambda(const UInt_t l){LambdaMin = l;}
+  void SetChargeSigma(const Double_t c){ChargeSigma = c;}
 
   //utilities
   void SaveParameterInTree(TTree*) const;
   void InitializeNoiseFromROOTFile(const char*, const char* branchname = "MM3X_sigma");
   std::vector<UInt_t> CreateMultiplexedStrips(UInt_t*) const;
   bool IsStripValid(const UInt_t*, const UInt_t,const UInt_t noisesigma = 2) const;
+  void DoLambdaScan(UInt_t*, std::vector<Double_t>&, std::vector<Double_t>&);
 
  private:
   //Fundamental parameters
@@ -46,6 +46,7 @@ namespace Micromega
   UInt_t MultiplexFactor;
   UInt_t NumberOfStrips;
   UInt_t MPVCharge;
+  Double_t ChargeSigma;
   double Sigma;
   UInt_t verbose;
   Double_t LambdaMin;
@@ -63,9 +64,12 @@ namespace Micromega
   //PRIVATE FUNCTIONS
   void FillRegMatrix();
   void FillMultiplexingMatrix(const MapMethod);
-  void FillData(const UInt_t);
-  void CreateCluster(UInt_t*, const Double_t, const ClusterMethod = GAUS, const NoiseMethod = NONE);
+  void FillData(const UInt_t);  
   void Clear();
+
+  //Cluster functions
+  void CreateCluster(UInt_t*, const Double_t, const ClusterMethod = GAUS, const NoiseMethod = NONE);
+  void CreateClusterWithGaus(const Double_t, const Double_t, const UInt_t, UInt_t*) const;
 
   //building multiplexing mapping
   void BuildMultiplexingFromAlgorithm();

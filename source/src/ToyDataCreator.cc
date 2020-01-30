@@ -21,6 +21,7 @@ namespace Micromega
   NumberOfChannels(NumberOfChannels_),
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
+  ChargeSigma(20.), //from Landau fit of run 4238 MM3X
   Sigma(Sigma_),
   verbose(0),
   LambdaMin(1.),
@@ -63,6 +64,7 @@ namespace Micromega
   NumberOfChannels(NumberOfChannels_),
   MultiplexFactor(MultiplexFactor_),
   MPVCharge(MPVCharge_),
+  ChargeSigma(20.), //from Landau fit of run 4238 MM3X  
   Sigma(Sigma_),
   verbose(0),
   LambdaMin(1.),  
@@ -128,33 +130,23 @@ namespace Micromega
                                     const ClusterMethod clusmethod,
                                     const NoiseMethod noisemethod)
  {
-  const Double_t clustersigma       = gRandom->Poisson(Sigma);
-  const UInt_t   clustertotalcharge = gRandom->Landau(MPVCharge, 20); //SSigma currently based on MM3 x plane    
+
+  UInt_t   clustertotalcharge;
+  Double_t clustersigma;
   
-  //create actual gaussian
+  //create actual cluster
   switch(clusmethod)
    {
    case GAUS:
-    for(UInt_t i(0); i < clustertotalcharge; ++i)
-     {
-      //select strips
-      UInt_t strip(NumberOfStrips + 1);
-      while( strip > NumberOfStrips)
-       strip = (UInt_t)(gRandom->Gaus(clusterposition, clustersigma));
-      StripsOutput[strip] += 1;
-     }
+    clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
+    clustersigma       = gRandom->Uniform(Sigma - 1, Sigma + 1);
+    CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
     break;
    default:
-    for(UInt_t i(0); i < clustertotalcharge; ++i)
-     {
-      //select strips
-      UInt_t strip(NumberOfStrips + 1);
-      while( strip > NumberOfStrips)
-       strip = (UInt_t)(gRandom->Gaus(clusterposition, clustersigma));
-      StripsOutput[strip] += 1;
-     }    
-    break; 
-    
+    clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
+    clustersigma       = gRandom->Uniform(Sigma - 1, Sigma + 1);
+    CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
+    break;     
    }
 
   //add the entry to the strip after a smearing,
@@ -191,6 +183,22 @@ namespace Micromega
   positions.push_back(clusterposition);
   amplitudes.push_back(clustersigma);
   charges.push_back(clustertotalcharge);
+  
+ }
+
+ void ToyDataCreator::CreateClusterWithGaus(const Double_t clusterposition,
+                                            const Double_t clustersigma,
+                                            const UInt_t clustertotalcharge,
+                                            UInt_t* StripsOutput) const
+ {
+  for(UInt_t i(0); i < clustertotalcharge; ++i)
+   {
+    //select strips
+    UInt_t strip(NumberOfStrips + 1);
+    while( strip > NumberOfStrips)
+     strip = (UInt_t)(gRandom->Gaus(clusterposition, clustersigma));
+    StripsOutput[strip] += 1;
+   }
   
  }
 
@@ -260,7 +268,7 @@ namespace Micromega
     NumericalMinimization(Strips_Processed, verbose, LambdaMin);
    }
     
-    return true;
+  return true;
   
   
   
@@ -286,7 +294,7 @@ namespace Micromega
     //check if it exist
     if(Utils::FileExist(mapname))
      {
-     BuildMultiplexingFromTXTFile(mapname);
+      BuildMultiplexingFromTXTFile(mapname);
      }
     else
      {
@@ -455,6 +463,32 @@ namespace Micromega
   return isvalid;
  }
 
+ //DoLambdaScan
+ void ToyDataCreator::DoLambdaScan(UInt_t* Chan,
+                                   std::vector<Double_t>& minima,
+                                   std::vector<Double_t>& scanpoint)                   
+ {
+  //Clear vector
+  Clear();
+  //Define solutions
+  Double_t solutions[NumberOfStrips];  
+  //load info into data
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)data_v.push_back(Chan[chan]);
+
+  //apply minimization for each scan point
+  for(UInt_t i(0); i < 10; ++i)
+   {
+    const Double_t lambda = scanpoint[i];
+    NumericalMinimization(solutions, verbose, lambda);
+    //get minimum
+    const Double_t min = LogLikelihood(solutions);
+    //load it into the histogram
+    minima[i] = min;
+    std::cout << "lambda: " << lambda << " min: " << min << " \n";
+   }
+ }
+                   
+
 
  //Get Function
  Double_t ToyDataCreator::GetPosition(UInt_t index)
@@ -507,7 +541,7 @@ namespace Micromega
     NOISE[chan] = Noise[chan];
     for(UInt_t mfac(0); mfac < MultiplexFactor; ++mfac)
      {
-     //find strip, (very inefficient)
+      //find strip, (very inefficient)
       UInt_t strip(0);
       while(ReverseMultiplexMAP[strip] != chan)++strip;
       MicromegasMap[chan][mfac] = strip;
