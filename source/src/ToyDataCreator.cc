@@ -139,12 +139,14 @@ namespace Micromega
    {
    case GAUS:
     clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
-    clustersigma       = gRandom->Uniform(Sigma - 1, Sigma + 1);
+    clustersigma       = gRandom->Gaus(Sigma, 1);
+    while(clustersigma < 0.5)clustersigma       = gRandom->Gaus(Sigma, 1);
     CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
     break;
    default:
     clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
-    clustersigma       = gRandom->Uniform(Sigma - 1, Sigma + 1);
+    clustersigma       = gRandom->Gaus(Sigma, 1);
+    while(clustersigma < 0.5)clustersigma       = gRandom->Gaus(Sigma, 1);    
     CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
     break;     
    }
