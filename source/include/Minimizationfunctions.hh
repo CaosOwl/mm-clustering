@@ -70,6 +70,7 @@ double LogLikelihood(const double *pars )
 inline void NumericalMinimization(Double_t* solution,
                                   UInt_t verbose = 0,
                                   Double_t mylambda = 1.,
+                                  const Double_t Initial_Guess = 100.,
                                   UInt_t maxiteration = 50,
                                   UInt_t maxfunccall  = 8e+05
                                   )
@@ -117,13 +118,13 @@ inline void NumericalMinimization(Double_t* solution,
  ROOT::Math::Functor f(&LogLikelihood,NStrips); 
  double step[NStrips];
  for(UInt_t i = 0; i < NStrips; i++){
-  step[i] = 100;
+  step[i] = Initial_Guess;
  }
  min->SetFunction(f);
 
  Double_t variable[NStrips];
  for(UInt_t i = 0; i < NStrips; i++){
-  variable[i] = 100; //starting value
+  variable[i] = Initial_Guess; //starting value
  }
  
  // Set the free variables to be minimized!
@@ -134,7 +135,13 @@ inline void NumericalMinimization(Double_t* solution,
  } 
 
  min->Minimize(); 
- for(UInt_t s(0); s < NStrips; ++s)solution[s] = min->X()[s];
+ for(UInt_t s(0); s < NStrips; ++s)
+  {
+   if(min->X()[s] > Initial_Guess - 1.)
+    solution[s] = 0.;
+   else
+    solution[s] = min->X()[s];
+  }
  
  delete min;
 
