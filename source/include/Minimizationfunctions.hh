@@ -71,8 +71,9 @@ inline void NumericalMinimization(Double_t* solution,
                                   UInt_t verbose = 0,
                                   Double_t mylambda = 1.,
                                   const Double_t Initial_Guess = 100.,
-                                  UInt_t maxiteration = 50,
-                                  UInt_t maxfunccall  = 8e+05
+                                  const UInt_t maxiteration = 50,
+                                  const UInt_t maxfunccall  = 2e+05,
+                                  const UInt_t tolerance    = 100
                                   )
 {
  // GSL Simulated Annealing minimizer
@@ -111,7 +112,7 @@ inline void NumericalMinimization(Double_t* solution,
   //gErrorIgnoreLevel = 1001; 
   min->SetPrintLevel(verbose);
   min->SetMaxIterations(maxiteration);
-  //   min->SetTolerance(30000);
+  //min->SetTolerance(tolerance);
   min->SetMaxFunctionCalls(maxfunccall);
  }
   

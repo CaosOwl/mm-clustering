@@ -27,6 +27,7 @@ OBJECTFILES  := $(patsubst $(SRCDIR)/%.cc,     $(OBJDIR)/%.o,  $(SRCFILES))
 
 #add exception to files
 #EXCEPTIONFILES := $(filter-out $(SRCDIR)/utilities/OrgFile.cc $(SRCDIR)/utilities/OrgTable.cc, $(UTILITYFILES))
+INCLUDEFILES += $(INCLUDEDIR)/ClusteringFunction.hh
 
 LIBS := -lGeom -lEG -lMinuit  -lTMVA -lSpectrum -lboost_program_options -lboost_system -lboost_filesystem
 
