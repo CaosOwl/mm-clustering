@@ -97,6 +97,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,        
         {"from-file","switch","take multiplex map from file","all"}
         ,
+        {"no-smearing","switch","no smearing applied to the physical strips","all"}
+        ,        
         {"save-waveforms","switch","save all created cluster in histograms","all"}
         ,
         {"apply-minimization","switch","apply minimization procedure to strips","all"}

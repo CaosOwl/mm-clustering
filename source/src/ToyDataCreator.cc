@@ -128,7 +128,8 @@ namespace Micromega
  void ToyDataCreator::CreateCluster(UInt_t* StripsOutput,
                                     const Double_t clusterposition,
                                     const ClusterMethod clusmethod,
-                                    const NoiseMethod noisemethod)
+                                    const NoiseMethod noisemethod,
+                                    const bool DoSmearing)
  {
 
   UInt_t   clustertotalcharge;
@@ -156,11 +157,17 @@ namespace Micromega
   //NOTA2: Poisson used for tyhe smearing
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
    {
-    Double_t noise(0.);
-    Double_t value = gRandom->Poisson(StripsOutput[strip]);
-    if(value < 0)value = 0.;
-     
-
+    Double_t value(0.),noise(0.);
+    if(DoSmearing)
+     {
+      value = gRandom->Poisson(StripsOutput[strip]);
+     }
+    else
+     {
+      value = StripsOutput[strip];
+     }     
+    if(value < 0)value = 0.;     
+  
     //add noise tot the strips
     switch(noisemethod)
      {
@@ -209,7 +216,8 @@ namespace Micromega
                                   Double_t* Strips_Processed,
                                   const UInt_t NumberOfClusters,
                                   const bool DoMinimization,
-                                  const Double_t minimaldistance)
+                                  const Double_t minimaldistance,
+                                  const bool DoSmearing)
  {
 
   //reset variables
@@ -239,7 +247,8 @@ namespace Micromega
     CreateCluster(Strips_Physical,
                   clusterposition,
                   clustermethod,
-                  noisemethod);
+                  noisemethod,
+                  DoSmearing);
    }
 
   //define multiplexing output

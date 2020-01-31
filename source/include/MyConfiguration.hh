@@ -46,6 +46,7 @@ namespace Config
   bool           SaveWaveformsSwitch()              { return SaveWaveforms;}
   bool           MinimizationSwitch()               { return ApplyMinimization;}
   bool           UserFileSwitch()                   { return UseUserFile;}
+  bool           SmearingSwitch()                   { return !ApplySmearing;} //carefull! return inverse value
 
  private:
   //CONFIGURATION
@@ -67,6 +68,7 @@ namespace Config
   bool      UseUserFile;
   bool      SaveWaveforms;
   bool      ApplyMinimization;
+  bool      ApplySmearing;
   
   TString     outname;
   std::string targetfile;

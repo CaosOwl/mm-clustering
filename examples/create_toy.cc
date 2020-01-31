@@ -138,9 +138,10 @@ int main (int argc, char *argv[])
     Creator->GenerateToy(ChanOutput,            
                          StripsOutput,
                          StripsOutputProcessed,
-                         config->GetNClusters(),          //number of clusters to generate
+                         config->GetNClusters(),         //number of clusters to generate
                          config->MinimizationSwitch(),   //If minimization procedure must be applied or not
-                         config->GetMinimalDistance());     //minimal distance between the clusters
+                         config->GetMinimalDistance(),   //minimal distance between the clusters
+                         config->SmearingSwitch());      // if smearing is applied to clustering  
 
     //assign true
     for(UInt_t j(0);j < config->GetNClusters();++j)
