@@ -204,7 +204,7 @@ namespace Micromega
   TH1I* histo = new TH1I("dummy", "dummy", NumberOfStrips, -0.5, NumberOfStrips - 0.5);
   histo->SetDirectory(0);
   for(UInt_t i(0); i < clustertotalcharge; ++i)histo->Fill(gRandom->Gaus(clusterposition, clustersigma));
-  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] = histo->GetBinContent(i);
+  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] += histo->GetBinContent(i);
   //StripsOutput = histo->GetX();
 #if 0
   for(UInt_t i(0); i < clustertotalcharge; ++i)
