@@ -200,15 +200,23 @@ namespace Micromega
                                             const UInt_t clustertotalcharge,
                                             UInt_t* StripsOutput) const
  {
+
+  TH1I* histo = new TH1I("dummy", "dummy", NumberOfStrips, -0.5, NumberOfStrips - 0.5);
+  histo->SetDirectory(0);
+  for(UInt_t i(0); i < clustertotalcharge; ++i)histo->Fill(gRandom->Gaus(clusterposition, clustersigma));
+  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] = histo->GetBinContent(i);
+  //StripsOutput = histo->GetX();
+#if 0
   for(UInt_t i(0); i < clustertotalcharge; ++i)
    {
     //select strips
     UInt_t strip(NumberOfStrips + 1);
     while( strip > NumberOfStrips)
-     strip = (UInt_t) (std::floor((gRandom->Gaus(clusterposition, clustersigma))));
+     strip = (UInt_t) (std::ceil((gRandom->Gaus(clusterposition, clustersigma)))) + 1;
     StripsOutput[strip] += 1;
+    //std::cout << "cluster pos: " << clusterposition << " strip: " << strip << "\n";
    }
-  
+#endif
  }
 
  bool ToyDataCreator::GenerateToy(UInt_t* Chan,
