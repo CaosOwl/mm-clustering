@@ -205,7 +205,7 @@ namespace Micromega
     //select strips
     UInt_t strip(NumberOfStrips + 1);
     while( strip > NumberOfStrips)
-     strip = (UInt_t)(gRandom->Gaus(clusterposition, clustersigma));
+     strip = (UInt_t) (std::floor((gRandom->Gaus(clusterposition, clustersigma))));
     StripsOutput[strip] += 1;
    }
   
