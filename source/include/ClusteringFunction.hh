@@ -286,8 +286,10 @@ TCanvas* FitPeaks(UInt_t* Strips,
  TLine line;
  line.SetLineColor(kBlack);
  line.SetLineWidth(3);
- line.DrawLine(plane.true1.position, 0, plane.true1.position, 100);
- line.DrawLine(plane.true2.position, 0, plane.true2.position, 100);
+ const Double_t height1 = plane.histo->GetBinContent((UInt_t)std::floor(plane.true1.position));
+ const Double_t height2 = plane.histo->GetBinContent((UInt_t)std::floor(plane.true2.position));
+ line.DrawLine(plane.true1.position, 0, plane.true1.position, height1);
+ line.DrawLine(plane.true2.position, 0, plane.true2.position, height2);
 
  return canv;
  
