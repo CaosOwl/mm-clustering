@@ -1,13 +1,14 @@
 #pragma once
 //root
 #include"TH1.h"
+#include"TH2.h"
 #include"TTree.h"
 //std
 #include<vector>
 
 namespace Micromega
 {
- enum ClusterMethod{GAUS};
+ enum ClusterMethod{GAUS, GAUSFROMFILE};
  enum NoiseMethod{NONE, FROMFILE};
  enum MapMethod{ALGO, TXT, ROOT};
  
@@ -39,6 +40,7 @@ namespace Micromega
   std::vector<UInt_t> CreateMultiplexedStrips(UInt_t*) const;
   bool IsStripValid(const UInt_t*, const UInt_t,const UInt_t noisesigma = 2) const;
   void DoLambdaScan(UInt_t*, std::vector<Double_t>&, std::vector<Double_t>&);
+  void InitializeChargeVsSigmaHisto(const char*, const char*);
 
  private:
   //Fundamental parameters
@@ -52,6 +54,8 @@ namespace Micromega
   Double_t LambdaMin;
   NoiseMethod   noisemethod;
   ClusterMethod clustermethod;
+  //histogram to define a plane
+  TH2F* ChargeVsSigma;
   //mapping
   std::vector<UInt_t> ReverseMultiplexMAP;
   std::vector<UInt_t> Noise;
@@ -68,13 +72,13 @@ namespace Micromega
   void Clear();
 
   //Cluster functions
-  void CreateCluster(UInt_t*, const Double_t, const ClusterMethod = GAUS, const NoiseMethod = NONE, const bool DoSmearing = true);
+  void CreateCluster(UInt_t*, const Double_t, const ClusterMethod = GAUS, const bool DoSmearing = true);
   void CreateClusterWithGaus(const Double_t, const Double_t, const UInt_t, UInt_t*) const;
 
   //building multiplexing mapping
   void BuildMultiplexingFromAlgorithm();
-  void BuildMultiplexingFromTXTFile(const char* filename);
-  void BuildMultiplexingFromROOTFile(const char* filename);
+  void BuildMultiplexingFromTXTFile(const char*);
+  void BuildMultiplexingFromROOTFile(const char*);
   TString BuildMultiplexFileName() const;
  };
 

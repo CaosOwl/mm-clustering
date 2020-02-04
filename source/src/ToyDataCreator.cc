@@ -26,7 +26,7 @@ namespace Micromega
   verbose(0),
   LambdaMin(1.),
   noisemethod(NoiseMethod::NONE),
-  clustermethod(ClusterMethod::GAUS)
+  clustermethod(ClusterMethod::GAUS)  
  {
   //calcualte number of strips
   NumberOfStrips = NumberOfChannels * MultiplexFactor;
@@ -128,66 +128,47 @@ namespace Micromega
  void ToyDataCreator::CreateCluster(UInt_t* StripsOutput,
                                     const Double_t clusterposition,
                                     const ClusterMethod clusmethod,
-                                    const NoiseMethod noisemethod,
                                     const bool DoSmearing)
  {
 
-  UInt_t   clustertotalcharge;
-  Double_t clustersigma;
+  Double_t clustertotalcharge(1e5);
+  Double_t clustersigma(1e5);
   
   //create actual cluster
   switch(clusmethod)
-   {
+   {    
    case GAUS:
     clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
     clustersigma       = gRandom->Gaus(Sigma, 1);
     while(clustersigma < 0.5)clustersigma       = gRandom->Gaus(Sigma, 1);
-    CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
+    CreateClusterWithGaus(clusterposition, clustersigma, (UInt_t)clustertotalcharge, StripsOutput);
     break;
+   case GAUSFROMFILE:
+    //while(clustertotalcharge > 500)   //hard coded limit to cluster charge
+    ChargeVsSigma->GetRandom2(clustertotalcharge, clustersigma);
+    //correction
+    clustersigma /= 2; //convert amplitude to gaus sigma WARNING: factor to check
+    //create gaus
+    CreateClusterWithGaus(clusterposition, clustersigma, (UInt_t)clustertotalcharge, StripsOutput);
    default:
     clustertotalcharge = gRandom->Landau(MPVCharge, ChargeSigma); //SSigma currently based on MM3 x plane
     clustersigma       = gRandom->Gaus(Sigma, 1);
     while(clustersigma < 0.5)clustersigma       = gRandom->Gaus(Sigma, 1);    
-    CreateClusterWithGaus(clusterposition, clustersigma, clustertotalcharge, StripsOutput);
+    CreateClusterWithGaus(clusterposition, clustersigma, (UInt_t)clustertotalcharge, StripsOutput);
     break;     
    }
 
-  //add the entry to the strip after a smearing,
-  //NOTA: nbins = nstriips
-  //NOTA2: Poisson used for tyhe smearing
-  for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
+  if(DoSmearing)
    {
-    Double_t value(0.),noise(0.);
-    if(DoSmearing)
+    for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
      {
-      value = gRandom->Poisson(StripsOutput[strip]);
+      Double_t value = gRandom->Poisson(StripsOutput[strip]);
+      if(value < 0)
+       value = 0.;
+      StripsOutput[strip] = (UInt_t)value;
      }
-    else
-     {
-      value = StripsOutput[strip];
-     }     
-    if(value < 0)value = 0.;     
-  
-    //add noise tot the strips
-    switch(noisemethod)
-     {
-     case NONE:
-      break;
-     case FROMFILE:
-      //use saved noise
-      noise = gRandom->Gaus(0, Noise[ReverseMultiplexMAP[strip]]);
-      break;
-     default:
-      break;
-     }
-    StripsOutput[strip] = value + noise;
-
-    if(noise + value > 0. )
-     StripsOutput[strip] = value + noise;
-    else
-     StripsOutput[strip] = 0;
    }
-
+  
   //save cluster main values
   positions.push_back(clusterposition);
   amplitudes.push_back(clustersigma);
@@ -204,7 +185,7 @@ namespace Micromega
   TH1I* histo = new TH1I("dummy", "dummy", NumberOfStrips, -0.5, NumberOfStrips - 0.5);
   histo->SetDirectory(0);
   for(UInt_t i(0); i < clustertotalcharge; ++i)histo->Fill(gRandom->Gaus(clusterposition, clustersigma));
-  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] += histo->GetBinContent(i);
+  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] = histo->GetBinContent(i);
   //StripsOutput = histo->GetX();
 #if 0
   for(UInt_t i(0); i < clustertotalcharge; ++i)
@@ -255,9 +236,10 @@ namespace Micromega
     CreateCluster(Strips_Physical,
                   clusterposition,
                   clustermethod,
-                  noisemethod,
                   DoSmearing);
    }
+
+
 
   //define multiplexing output
   UInt_t chan(0);
@@ -265,6 +247,35 @@ namespace Micromega
    {
     Chan[ReverseMultiplexMAP[strip]] += Strips_Physical[strip];
    }
+
+  
+  
+  //add the entry to the strip after a smearing,
+  //NOTA: nbins = nstriips
+  //NOTA2: Poisson used for tyhe smearing
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
+   {
+    Double_t value(0.),noise(0.);
+    value = Chan[chan];
+  
+    //add noise tot the strips
+    switch(noisemethod)
+     {
+     case NONE:
+      break;
+     case FROMFILE:
+      //use saved noise
+      noise = gRandom->Gaus(0, Noise[chan]);
+      break;
+     default:
+      break;
+     }
+
+    if(noise + value > 0. )
+     Chan[chan] = value + noise;
+    else
+     Chan[chan] = 0;
+ }
   
   //Apply multiplexing, remove noise and remove single strips
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
@@ -504,6 +515,22 @@ namespace Micromega
     //load it into the histogram
     minima[i] = min;
     std::cout << "lambda: " << lambda << " min: " << min << " \n";
+   }
+ }
+
+ void ToyDataCreator::InitializeChargeVsSigmaHisto(const char* filename, const char* histoname)
+ {
+  TFile* file = new TFile(filename, "READ");
+  //histo
+  ChargeVsSigma = (TH2F*)file->Get(histoname);
+  if(ChargeVsSigma)
+   {
+    std::cout << "histogram with name: " << histoname << " successfuly loaded from file: " << filename << " \n";
+    clustermethod = GAUSFROMFILE;
+   }
+  else
+   {
+    std::cout << "histogram with name: " << histoname << " was not found in file: " << filename << " \n";
    }
  }
                    

@@ -98,6 +98,7 @@ int main (int argc, char *argv[])
                                             );
     //noise as well
     Creator->InitializeNoiseFromROOTFile(config->GetTargetFile().c_str(), "MM3X_sigma");
+    Creator->InitializeChargeVsSigmaHisto(config->GetTargetFile().c_str(), "mm3x_chargeVSamplitude");
     Creator->SetNoiseMethod(Micromega::NoiseMethod::FROMFILE);
    }
   else
