@@ -35,7 +35,7 @@ LIBS := -lGeom -lEG -lMinuit  -lTMVA -lSpectrum -lboost_program_options -lboost_
 
 #HDF5LIBS :=  -L$(H5LIBPATH) -lhdf5 -Wl,-rpath $(H5LIBPATH)
 
-TARGETS := template test_clustering create_toy test_toy LambdaScan
+TARGETS := template test_clustering create_toy test_toy LambdaScan generate_doublecluster
 
 all: $(TARGETS)
 
