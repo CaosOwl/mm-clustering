@@ -157,17 +157,6 @@ namespace Micromega
     CreateClusterWithGaus(clusterposition, clustersigma, (UInt_t)clustertotalcharge, StripsOutput);
     break;     
    }
-
-  if(DoSmearing)
-   {
-    for(UInt_t strip(0); strip < NumberOfStrips; ++strip)
-     {
-      Double_t value = gRandom->Poisson(StripsOutput[strip]);
-      if(value < 0)
-       value = 0.;
-      StripsOutput[strip] = (UInt_t)value;
-     }
-   }
   
   //save cluster main values
   positions.push_back(clusterposition);
@@ -185,19 +174,7 @@ namespace Micromega
   TH1I* histo = new TH1I("dummy", "dummy", NumberOfStrips, -0.5, NumberOfStrips - 0.5);
   histo->SetDirectory(0);
   for(UInt_t i(0); i < clustertotalcharge; ++i)histo->Fill(gRandom->Gaus(clusterposition, clustersigma));
-  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] = histo->GetBinContent(i);
-  //StripsOutput = histo->GetX();
-#if 0
-  for(UInt_t i(0); i < clustertotalcharge; ++i)
-   {
-    //select strips
-    UInt_t strip(NumberOfStrips + 1);
-    while( strip > NumberOfStrips)
-     strip = (UInt_t) (std::ceil((gRandom->Gaus(clusterposition, clustersigma)))) + 1;
-    StripsOutput[strip] += 1;
-    //std::cout << "cluster pos: " << clusterposition << " strip: " << strip << "\n";
-   }
-#endif
+  for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] += histo->GetBinContent(i);
  }
 
  bool ToyDataCreator::GenerateToy(UInt_t* Chan,
