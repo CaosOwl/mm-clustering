@@ -127,8 +127,8 @@ namespace Micromega
 
  void ToyDataCreator::CreateCluster(UInt_t* StripsOutput,
                                     const Double_t clusterposition,
-                                    const ClusterMethod clusmethod,
-                                    const bool DoSmearing)
+                                    const ClusterMethod clusmethod
+                                    )
  {
 
   Double_t clustertotalcharge(1e5);
@@ -182,8 +182,7 @@ namespace Micromega
                                   Double_t* Strips_Processed,
                                   const UInt_t NumberOfClusters,
                                   const bool DoMinimization,
-                                  const Double_t minimaldistance,
-                                  const bool DoSmearing)
+                                  const Double_t minimaldistance)
  {
 
   //reset variables
@@ -212,8 +211,8 @@ namespace Micromega
     
     CreateCluster(Strips_Physical,
                   clusterposition,
-                  clustermethod,
-                  DoSmearing);
+                  clustermethod
+                  );
    }
 
 

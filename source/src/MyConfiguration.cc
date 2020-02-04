@@ -25,7 +25,6 @@ namespace Config
   SaveWaveforms             = false;
   ApplyMinimization         = false;
   UseUserFile               = false;
-  ApplySmearing             = false;  
   targetfile                = "dummy";
   outname.Form("ToyCluster_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
                NumberOfChannels,
@@ -58,7 +57,6 @@ namespace Config
   configuration.GetOption(SaveWaveforms,         "save-waveforms"        );
   configuration.GetOption(MultiplexFromFile,     "from-file"             );
   configuration.GetOption(ApplyMinimization,     "apply-minimization"    );
-  configuration.GetOption(ApplySmearing,         "no-smearing"           );  
   
   //Calculate rest
   NumberOfStrips = MultiplexFactor * NumberOfChannels;
@@ -96,10 +94,6 @@ namespace Config
    {
     std::cout << "\033[1;34m --> All will be minimized before storing: \033[0m \n";
    }
-  if(ApplySmearing)
-   {
-    std::cout << "\033[1;34m --> No automatic smearing will be applied in the strips: \033[0m \n";
-   }
   
   if(MinimalDistance > 0)
    {
@@ -132,7 +126,6 @@ namespace Config
   Utils::AddParameterToList(list, "Sigma",            Sigma);
   Utils::AddParameterToList(list, "NClusters",        NClusters);
   Utils::AddParameterToList(list, "Minimization",     ApplyMinimization);
-  Utils::AddParameterToList(list, "No-Smearing",      ApplySmearing);  
   if(MinimalDistance > 0)
    Utils::AddParameterToList(list, "MinimalDistance", MinimalDistance);
 
@@ -161,8 +154,6 @@ namespace Config
 
   //minimal distance
   if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);
-
-  if(ApplySmearing) outname += "_nosmearing";
 
   return outname;
  }
