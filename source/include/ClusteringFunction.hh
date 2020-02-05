@@ -39,10 +39,11 @@ struct FitPlane
  FitClus sol1;
  FitClus sol2;
  UInt_t peaksfound;
+ Double_t chi2;
 
  Double_t distance() const
  {
-  return true1.position - true2.position;
+  return fabs(true1.position - true2.position);
  }
 
  Double_t residual1() const
@@ -118,7 +119,7 @@ TF1* CreateClusFunction(Double_t range1,
  TString name;
  name.Form("mygaus%i", tag);
  TF1* res = new TF1(name,
-                    "[0] * TMath::Gaus(x, [1], [2])",
+                    "[0] * TMath::Gaus(x, [1], [2])",                    
                     range1,
                     range2);
 
@@ -150,8 +151,8 @@ TF1* CreateDoubleClusFunction(const char* name,
  return totalfit;
 }
 
-
-TCanvas* FitPeaks(UInt_t* Strips,
+template<typename myvar>
+TCanvas* FitPeaks(myvar* Strips,
                   UInt_t nstrips,
                   FitPlane& plane,
                   FitMethod method)
@@ -161,6 +162,7 @@ TCanvas* FitPeaks(UInt_t* Strips,
 
  //build histogram
  plane.histo = new TH1F("histo", "true histo", nstrips, -0.5, nstrips - 0.5);
+ plane.histo->SetDirectory(0);
  for(UInt_t n(0); n < nstrips; ++n)plane.histo->SetBinContent(n, Strips[n]);
 
  //range of the fit
@@ -188,13 +190,9 @@ TCanvas* FitPeaks(UInt_t* Strips,
                     "nodraw",
                     0.05
                     );
- std::cout << "peak found: " << peakfinder->GetNPeaks() << "\n";
+ 
  Double_t* Peaks = peakfinder->GetPositionX();
  UInt_t npeaks = peakfinder->GetNPeaks();
- for(UInt_t peak(0); peak < npeaks; ++peak)
-  {
-   std::cout << "position: " << Peaks[peak] << "\n";
-  }
 
  if(npeaks == 0)
   {
@@ -258,18 +256,22 @@ TCanvas* FitPeaks(UInt_t* Strips,
                          );
 
  //fix parameters
- //totalfit->FixParameter(4, plane.true1.sigma);
- //totalfit->FixParameter(5, plane.true2.sigma);
+ totalfit->FixParameter(4, plane.true1.sigma);
+ totalfit->FixParameter(5, plane.true2.sigma);
 
  //final combined fit
  gStyle->SetOptFit(1);
- plane.histo->Fit("totalfit", "MR+", "", range1, range2);
+ plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
 
  //save results
  FitClus sol1(totalfit->GetParameter("Posi1"),totalfit->GetParameter("Sigm1"),totalfit->GetParameter("Norm1"));
  FitClus sol2(totalfit->GetParameter("Posi2"),totalfit->GetParameter("Sigm2"),totalfit->GetParameter("Norm2"));
  //matching solutions
  plane.matchsolutions(sol1, sol2);
+
+ //set additional variable
+ plane.chi2 = totalfit->GetChisquare();
+ plane.peaksfound = npeaks;
 
  TString name(plane.histo->GetName());
  canv->SetName(name + "-canv");
@@ -286,8 +288,8 @@ TCanvas* FitPeaks(UInt_t* Strips,
  TLine line;
  line.SetLineColor(kBlack);
  line.SetLineWidth(3);
- const Double_t height1 = plane.histo->GetBinContent((UInt_t)std::floor(plane.true1.position));
- const Double_t height2 = plane.histo->GetBinContent((UInt_t)std::floor(plane.true2.position));
+ const Double_t height1 = plane.histo->GetMaximum();//plane.histo->GetBinContent((UInt_t)std::ceil(plane.true1.position));
+ const Double_t height2 = plane.histo->GetMaximum();//plane.histo->GetBinContent((UInt_t)std::ceil(plane.true2.position));
  line.DrawLine(plane.true1.position, 0, plane.true1.position, height1);
  line.DrawLine(plane.true2.position, 0, plane.true2.position, height2);
 

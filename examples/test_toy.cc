@@ -68,12 +68,13 @@ int main (int argc, char *argv[])
    }
 
   //define important parameters
-  const UInt_t Nevents          = 1000;//MyTree->getEntries();
+  const UInt_t Nevents          = 10000;//MyTree->GetEntries();
   const UInt_t NumberOfChannels = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfChannels");
   const UInt_t MultiplexFactor  = Utils::GetIntParameter(InfoTree->GetUserInfo(), "MultiplexFactor");
   const UInt_t NumberOfStrips   = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfStrips");
   const UInt_t MPVCharge        = Utils::GetIntParameter(InfoTree->GetUserInfo(), "MPVCharge");
-  const UInt_t Sigma            = Utils::GetIntParameter(InfoTree->GetUserInfo(), "Sigma");  
+  const UInt_t Sigma            = Utils::GetIntParameter(InfoTree->GetUserInfo(), "Sigma");
+  const Double_t MinDistance    = 2; //Minimal distance between strips to count it as inefficiency
 
   //Connect branch
   UInt_t   Chan[NumberOfChannels];
@@ -97,19 +98,21 @@ int main (int argc, char *argv[])
   outname = inputname(inputname.Last('/') + 1, inputname.Last('.')) + "-analysed.root";
   TFile* output = new TFile(outname, "RECREATE");
   TTree* newinfotree = new TTree("InfoTree-analysis", "Infotree-analysis");
-  //Utils::AddInfoParameters(newinfotree, InfoTree->GetUserInfo());  
+  //Utils::AddInfoParameters(newinfotree, InfoTree->GetUserInfo());
+
+  //prepare folders
+  output->mkdir("good_events");
+  output->mkdir("bad_events");
 
   //Histograms
   output->mkdir("summary");
   output->cd("summary");
-  TH1F* Amplitude = new TH1F("Amplitude", "Amplitude of the Clusters; signal output", 1000, 0, 4000);
-  TH1F* SigmaOut  = new TH1F("Sigma",     "Sigma of the Clusters; sigma [strips]",    15, 0, 15);
   TH1F* NCluster  = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);
   TH1F* chi2      = new TH1F("chi2",      "$chi^2 of the fit; #chi^2",                1000, 0, 10);
-  TH2F* residuals = new TH2F("resvsdist", "residual of the hits vs distance between hist; distance [strip]; residual [strip]",20, -0.5, 20, 600, 0., 3);
-  TProfile* errorprofile = new TProfile("err_profile", "residual against number of strips; distance [strips]; residual [strips]", 20, -0.5, 19.5);
-  TH1F* distance    = new TH1F("distance", "Distance of clusters; distance [strips];",20, -0.5, 19.5);
-  TH1F* efficiency = new TH1F("efficiency", "efficiency as function of distance; distance [strips]; efficiency [%]",20, -0.5, 19.5);
+  TH2F* residuals = new TH2F("resvsdist", "residual of the hits vs distance between hist; distance [strip]; residual [strip]",80, -0.5, 20, 600, 0., 3);
+  TProfile* errorprofile = new TProfile("err_profile", "residual against number of strips; distance [strips]; residual [strips]", 80, -0.5, 19.5);
+  TH1F* distance    = new TH1F("distance", "Distance of clusters; distance [strips];",80, -0.5, 19.5);
+  TH1F* efficiency = new TH1F("efficiency", "efficiency as function of distance; distance [strips]; efficiency [%]",80, -0.5, 19.5);
   output->cd();
   //Create new random number generator
   gRandom = new TRandom2(time(0));
@@ -133,27 +136,39 @@ int main (int argc, char *argv[])
     plane.histo->SetName(TString::Format("hist-%i", i));
     canv->SetName(TString::Format("%s-canv", plane.histo->GetName()));
 
+    //general histo
     distance->Fill(plane.distance());
+    chi2->Fill(plane.chi2);
+    NCluster->Fill(plane.peaksfound);
 
-    if(plane.residual1() < 3 && plane.residual2() < 3)
+    if(plane.residual1() < MinDistance && plane.residual2() < MinDistance)
      {
       residuals->Fill(plane.distance(), plane.residual1());
       residuals->Fill(plane.distance(), plane.residual2());
       errorprofile->Fill(plane.distance(), plane.residual1());
       errorprofile->Fill(plane.distance(), plane.residual2());
       efficiency->Fill(plane.distance());
+      //save in good directory
+      output->cd("good_events");
+      canv->Write();
+      output->cd();
+     }
+    else
+     {
+      output->cd("bad_events");
+      canv->Write();
+      output->cd(); 
      }
 
     //compare to actual solutions
-    std::cout << "event " << i << "\n";
-    plane.Print(std::cout);
-
-    canv->Write();
+    if(i%100 == 1)std::cout << "event " << i-1 << "\n";
+    //plane.Print(std::cout);
 
    }
   for(UInt_t n(0); n < 20; ++n)
    {
-    efficiency->SetBinContent(n, 100. * efficiency->GetBinContent(n) / distance->GetBinContent(n));
+    if(distance->GetBinContent(n) != 0)
+     efficiency->SetBinContent(n, 100. * efficiency->GetBinContent(n) / distance->GetBinContent(n));
    }
 
   MyTime.AddCheckPoint("finish loop");
