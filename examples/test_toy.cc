@@ -146,7 +146,7 @@ int main (int argc, char *argv[])
                              plane,
                              FitMethod::SPECTRUM);
     plane.histo->SetName(TString::Format("hist-%i", i));
-    canv->SetName(TString::Format("%s-canv", plane.histo->GetName()));
+    canv->SetName(TString::Format("%s-canv-d%0.1f", plane.histo->GetName(), plane.distance()));
 
     //general histo
     distance->Fill(plane.distance()); //double to match efficiency
