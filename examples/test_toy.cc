@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
    }
 
   //define important parameters
-  const UInt_t Nevents          = 10000;//MyTree->GetEntries();
+  const UInt_t Nevents          = 1;//MyTree->GetEntries();
   const UInt_t NumberOfChannels = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfChannels");
   const UInt_t MultiplexFactor  = Utils::GetIntParameter(InfoTree->GetUserInfo(), "MultiplexFactor");
   const UInt_t NumberOfStrips   = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfStrips");
@@ -83,13 +83,23 @@ int main (int argc, char *argv[])
   Double_t TruePositions[5];
   Double_t Sigmas[5];
   UInt_t Charges[5];
-   
-  MyTree->SetBranchAddress("ChanOutput",       Chan);
-  MyTree->SetBranchAddress("Strips_Physical",  StripsPhysical);
-  MyTree->SetBranchAddress("Strips_Processed", StripsProcessed);
-  MyTree->SetBranchAddress("TruePosition", TruePositions);
-  MyTree->SetBranchAddress("Sigma", Sigmas);
-  MyTree->SetBranchAddress("Charge", Charges);
+
+  if(Utils::BranchExist(InfoTree,"MicromegasMap"))
+   {
+     MyTree->SetBranchAddress("MM3X_ChanOutput",       Chan);
+     MyTree->SetBranchAddress("MM3X_StripsOutput",  StripsPhysical);
+     MyTree->SetBranchAddress("MM3XTruePosition", TruePositions);
+     PreprocessData = true;
+   }
+   else
+    {
+     MyTree->SetBranchAddress("ChanOutput",       Chan);
+     MyTree->SetBranchAddress("Strips_Physical",  StripsPhysical);
+     MyTree->SetBranchAddress("Strips_Processed", StripsProcessed);
+     MyTree->SetBranchAddress("TruePosition", TruePositions);
+     MyTree->SetBranchAddress("Sigma", Sigmas);
+     MyTree->SetBranchAddress("Charge", Charges);
+    }
 
     
 
@@ -109,10 +119,11 @@ int main (int argc, char *argv[])
   output->cd("summary");
   TH1F* NCluster  = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);
   TH1F* chi2      = new TH1F("chi2",      "$chi^2 of the fit; #chi^2",                1000, 0, 10);
-  TH2F* residuals = new TH2F("resvsdist", "residual of the hits vs distance between hist; distance [strip]; residual [strip]",80, -0.5, 20, 600, 0., 3);
-  TProfile* errorprofile = new TProfile("err_profile", "residual against number of strips; distance [strips]; residual [strips]", 80, -0.5, 19.5);
-  TH1F* distance    = new TH1F("distance", "Distance of clusters; distance [strips];",80, -0.5, 19.5);
-  TH1F* efficiency = new TH1F("efficiency", "efficiency as function of distance; distance [strips]; efficiency [%]",80, -0.5, 19.5);
+  TH2F* residuals = new TH2F("resvsdist", "residual of the hits vs distance between hist; distance [strip]; residual [strip]",40, -0.5, 20, 600, 0., 10);
+  TProfile* errorprofile = new TProfile("err_profile", "residual against number of strips; distance [strips]; residual [strips]", 40, -0.5, 19.5);
+  TProfile* errorprofile_total = new TProfile("err_profile_total", "residual against number of strips without any cut;distance [strips]; residual [strips]", 40, -0.5, 19.5);  
+  TH1F* distance    = new TH1F("distance", "Distance of clusters; distance [strips];",40, -0.5, 19.5);
+  TH1F* efficiency = new TH1F("efficiency", "efficiency as function of distance; distance [strips]; efficiency [%]",40, -0.5, 19.5);
   output->cd();
   //Create new random number generator
   gRandom = new TRandom2(time(0));
@@ -137,14 +148,16 @@ int main (int argc, char *argv[])
     canv->SetName(TString::Format("%s-canv", plane.histo->GetName()));
 
     //general histo
-    distance->Fill(plane.distance());
+    distance->Fill(plane.distance()); //double to match efficiency
     chi2->Fill(plane.chi2);
     NCluster->Fill(plane.peaksfound);
+    residuals->Fill(plane.distance(), plane.residual1());
+    residuals->Fill(plane.distance(), plane.residual2());
+    errorprofile_total->Fill(plane.distance(), plane.residual1());
+    errorprofile_total->Fill(plane.distance(), plane.residual2());    
 
     if(plane.residual1() < MinDistance && plane.residual2() < MinDistance)
      {
-      residuals->Fill(plane.distance(), plane.residual1());
-      residuals->Fill(plane.distance(), plane.residual2());
       errorprofile->Fill(plane.distance(), plane.residual1());
       errorprofile->Fill(plane.distance(), plane.residual2());
       efficiency->Fill(plane.distance());
@@ -165,7 +178,7 @@ int main (int argc, char *argv[])
     //plane.Print(std::cout);
 
    }
-  for(UInt_t n(0); n < 20; ++n)
+  for(UInt_t n(0); n < distance->GetNbinsX(); ++n)
    {
     if(distance->GetBinContent(n) != 0)
      efficiency->SetBinContent(n, 100. * efficiency->GetBinContent(n) / distance->GetBinContent(n));
@@ -180,6 +193,7 @@ int main (int argc, char *argv[])
 
   //save results  
   MyTime.SaveInTree(newinfotree);
+  Utils::SaveGitHashInTree(newinfotree);
   newinfotree->Write();
   output->Write();
   output->Close();

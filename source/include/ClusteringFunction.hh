@@ -15,6 +15,8 @@ enum FitMethod{SPECTRUM};
 
 const UInt_t mindistance = 1;
 
+bool PreprocessData(false);
+
 struct FitClus
 {
  Double_t position;
@@ -104,6 +106,24 @@ struct FitPlane
    }
  }
 
+ template<typename myvar>
+ void ProcessData(myvar* Strips)
+ {
+  //choose largest cluster
+  UInt_t range[] = {0,0};
+  UInt_t maxwidth(0);
+  for(UInt_t strip(0); strip < 320; ++strip)
+   {
+    UInt_t thiswidth(0);
+    while(Strips[strip] != 0 || strip == 320)
+     {
+      ++thiswidth;
+     }
+    if(thiswidth > maxwidth) maxwidth = thiswidth;
+   }
+
+ }
+
  void Print(ostream& stream)
  {
   stream << "solution 1 was: " << sol1.position << " with true solution: " << true1.position <<"\n";
@@ -157,6 +177,8 @@ TCanvas* FitPeaks(myvar* Strips,
                   FitPlane& plane,
                   FitMethod method)
 {
+ //if(PreprocessData)ProcessData(Strips);
+ 
  //create canvas
  TCanvas* canv = new TCanvas();
 
@@ -255,13 +277,19 @@ TCanvas* FitPeaks(myvar* Strips,
                          mygaus2->GetParameter(2)
                          );
 
- //fix parameters
- totalfit->FixParameter(4, plane.true1.sigma);
- totalfit->FixParameter(5, plane.true2.sigma);
+ if(plane.distance() < 16)
+  {
+   //continue with global fit
+   
+   //fix parameters
+   totalfit->FixParameter(4, plane.true1.sigma);
+   totalfit->FixParameter(5, plane.true2.sigma);
 
- //final combined fit
- gStyle->SetOptFit(1);
- plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+   //final combined fit
+   gStyle->SetOptFit(1);
+   plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+
+  }
 
  //save results
  FitClus sol1(totalfit->GetParameter("Posi1"),totalfit->GetParameter("Sigm1"),totalfit->GetParameter("Norm1"));
