@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
     return 1;    
    }
 
-  //Info tree
+  //Info tree  
   TTree* InfoTree = (TTree*)(input->Get(infotreename));
   if(!InfoTree)
    {
@@ -72,7 +72,9 @@ int main (int argc, char *argv[])
 
   //main parameters
   const UInt_t NumberOfChannels = 64;//Utils::GetParameter(InfoTree->GetUserInfo(), "NumberOfChannels", 1);
+  const UInt_t MultiplexFactor = 5;//Utils::GetParameter(InfoTree->GetUserInfo(), "NumberOfChannels", 1);
   const UInt_t DistanceBetweenEvent = 2;
+  const UInt_t QualityCut[] = {150, 250};
 
   //Connect branch
   TString planebranch("MM3X");
@@ -86,15 +88,21 @@ int main (int argc, char *argv[])
   outname = inputname(inputname.Last('/') + 1, inputname.Last('.')) + planebranch + "-output.root";
   TFile* output  = new TFile(outname, "RECREATE");
 
+  //collect multiplex map
+  UInt_t ReverseMultiplexMap[NumberOfChannels * MultiplexFactor];
+  Utils::ImportReverseMultiplexMap(ReverseMultiplexMap, InfoTree);
+
   //new tree
   TTree* outtree = new TTree("ClusterTree","ClusterTree");
   Double_t Chan_total[NumberOfChannels];
+  Double_t StripsOutput[NumberOfChannels * MultiplexFactor];
   Double_t Chan_1[NumberOfChannels];
   Double_t Chan_2[NumberOfChannels];
   Double_t TruePosition[5];
   outtree->Branch(planebranch+"_Chan1", &Chan_1, planebranch + TString::Format("_Chan1UInt_t[%i]/i", NumberOfChannels));
   outtree->Branch(planebranch+"_Chan2", &Chan_2, planebranch + TString::Format("_Chan2UInt_t[%i]/i", NumberOfChannels));
-  outtree->Branch(planebranch+"_ChanOutput", &Chan_total, planebranch + TString::Format("_ChanTotalUInt_t[%i]/i", NumberOfChannels));
+  outtree->Branch(planebranch+"_ChanOutput", &Chan_total, planebranch + TString::Format("_ChanOutputUInt_t[%i]/i", NumberOfChannels));
+  outtree->Branch(planebranch+"_StripsOutput", &StripsOutput, planebranch + TString::Format("_StripsOutputUInt_t[%i]/i", NumberOfChannels * MultiplexFactor));  
   outtree->Branch(planebranch+"TruePosition", &TruePosition, "TruePositionDouble_t[5]/D");
 
   //Create new random number generator
@@ -110,7 +118,7 @@ int main (int argc, char *argv[])
     //reset
     RecoPos = -1000;
     UInt_t event1 = i % MyTree->GetEntries();
-    while(RecoPos < -500) //skip empty event
+    while(RecoPos > QualityCut[1] || RecoPos < QualityCut[0]) //skip bad events
      {
       //event1 = gRandom->Uniform(MyTree->GetEntries());
       ++event1;
@@ -125,7 +133,7 @@ int main (int argc, char *argv[])
     //second event
     RecoPos = -1000;
     UInt_t event2(event1+DistanceBetweenEvent);
-    while(RecoPos < -500) //skip empty event
+    while(RecoPos > QualityCut[1] || RecoPos < QualityCut[0]) //skip bad events
      {
       //event2 = gRandom->Uniform(MyTree->GetEntries());
       ++event2;
@@ -136,6 +144,9 @@ int main (int argc, char *argv[])
     //save second event
     for(UInt_t chan(0); chan < NumberOfChannels; ++chan) {Chan_2[chan] = ChanOutput[chan]; Chan_total[chan] += ChanOutput[chan];}
     TruePosition[1] = RecoPos;
+
+    //also reconstruct the strips
+    for(UInt_t strip(0); strip < NumberOfChannels*MultiplexFactor; ++strip) {StripsOutput[strip] = ChanOutput[ReverseMultiplexMap[strip]];}
 
     //fill it
     outtree->Fill();
@@ -151,6 +162,7 @@ int main (int argc, char *argv[])
   MyTime.AddCheckPoint("finish loop");
 
   //write to file
+  InfoTree->Write();
   outtree->Write();
   output->Write();
   output->Close();
