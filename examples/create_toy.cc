@@ -216,6 +216,7 @@ int main (int argc, char *argv[])
   TTree* infotree = new TTree("InfoTree", "Parameter used for the toy");
   config->SaveParamterInTree(infotree);
   Creator->SaveParameterInTree(infotree);
+  Utils::SaveGitHashInTree(infotree);
   //write to file
   clustree->Write();
   timetree->Write();

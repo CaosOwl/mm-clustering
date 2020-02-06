@@ -162,6 +162,7 @@ int main (int argc, char *argv[])
   MyTime.AddCheckPoint("finish loop");
 
   //write to file
+  Utils::SaveGitHashInTree(InfoTree);
   InfoTree->Write();
   outtree->Write();
   output->Write();
