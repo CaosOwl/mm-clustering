@@ -306,19 +306,19 @@ TCanvas* FitPeaks(myvar* Strips,
    //final combined fit
    gStyle->SetOptFit(1);
    UInt_t fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
-   std::cout << fitresult << "\n";
+   //std::cout << fitresult << "\n";
    if(fitresult != 0 && plane.distance() < 6)
     {
      //assume very close cluster
-     totalfit->SetParameters(mygaus1->GetParameter(0),
-                             mygaus2->GetParameter(0),
-                             mygaus1->GetParameter(1),
-                             mygaus2->GetParameter(1),
-                             mygaus1->GetParameter(2),
-                             mygaus2->GetParameter(2)
+     totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
+                             normfit * plane.histo->GetBinContent(Peaks[0]),
+                             Peaks[0],
+                             Peaks[0],
+                             plane.true1.sigma,
+                             plane.true1.sigma
                              );
-     //fit again
-     plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+     //fit against
+     fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
     }
 
   }
