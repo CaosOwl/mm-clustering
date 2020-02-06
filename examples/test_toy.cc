@@ -34,10 +34,10 @@ int main (int argc, char *argv[])
  {
 
   //define inputs
-  if(argc < 2)
+  if(argc < 3)
    {
     std::cerr << "INVALID NUMBER OF INPUTS \n";
-    std::cout << "Usage: \n 1-N: inputs (.root) \n";
+    std::cout << "Usage: \n 1: inputs (.root) \n 2: number of events to analyse";
    }
   //start clock to time the analysis
   Time::TimeCheck MyTime(50);
@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
    }
 
   //define important parameters
-  const UInt_t Nevents          = 1;//MyTree->GetEntries();
+  const UInt_t Nevents          = atoi(argv[2]);//MyTree->GetEntries();
   const UInt_t NumberOfChannels = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfChannels");
   const UInt_t MultiplexFactor  = Utils::GetIntParameter(InfoTree->GetUserInfo(), "MultiplexFactor");
   const UInt_t NumberOfStrips   = Utils::GetIntParameter(InfoTree->GetUserInfo(), "NumberOfStrips");
@@ -129,7 +129,7 @@ int main (int argc, char *argv[])
   gRandom = new TRandom2(time(0));
 
   MyTime.AddCheckPoint("Start Loop");
-
+ 
   ///MAIN LOOP
   for(unsigned int i(0); i < Nevents; ++i)
    {

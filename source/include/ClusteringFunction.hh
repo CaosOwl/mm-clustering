@@ -115,13 +115,22 @@ struct FitPlane
   for(UInt_t strip(0); strip < 320; ++strip)
    {
     UInt_t thiswidth(0);
+    UInt_t range1(strip),range2(strip);
     while(Strips[strip] != 0 || strip == 320)
      {
       ++thiswidth;
+      ++range2;
      }
-    if(thiswidth > maxwidth) maxwidth = thiswidth;
+    if(thiswidth > maxwidth)
+     {
+      maxwidth = thiswidth;
+      range[0] = range1;
+      range[1] = range2;
+     }
    }
-
+    //cleanup
+    for(UInt_t r(0); r < range[0]; ++r)Strips[r] = 0;
+    for(UInt_t r(range[1]); r < 320; ++r)Strips[r] = 0;
  }
 
  void Print(ostream& stream)
@@ -265,8 +274,8 @@ TCanvas* FitPeaks(myvar* Strips,
  mygaus2->SetParLimits(2, plane.true2.sigma -1, plane.true2.sigma + 1);
 
  //do first first fit
- plane.histo->Fit("mygaus1", "QR+");//, "", Peaks[0] - plane.true1.sigma, Peaks[0] + plane.true1.sigma);
- plane.histo->Fit("mygaus2", "QR+");//, "", Peaks[1] - plane.true2.sigma, Peaks[1] + plane.true2.sigma);
+ plane.histo->Fit("mygaus1", "QR+", "", range1, range1 + plane.true1.sigma);
+ plane.histo->Fit("mygaus2", "QR+", "", range2 - plane.true2.sigma, range2);
 
  //set parameter for the second fit
  totalfit->SetParameters(mygaus1->GetParameter(0),
@@ -282,8 +291,8 @@ TCanvas* FitPeaks(myvar* Strips,
    //continue with global fit
    
    //fix parameters
-   totalfit->FixParameter(4, plane.true1.sigma);
-   totalfit->FixParameter(5, plane.true2.sigma);
+   //totalfit->FixParameter(4, plane.true1.sigma);
+   //totalfit->FixParameter(5, plane.true2.sigma);
 
    //final combined fit
    gStyle->SetOptFit(1);
