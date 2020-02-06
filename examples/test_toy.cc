@@ -154,8 +154,8 @@ int main (int argc, char *argv[])
     NCluster->Fill(plane.peaksfound);
     residuals->Fill(plane.distance(), plane.residual1());
     residuals->Fill(plane.distance(), plane.residual2());
-    errorprofile_total->Fill(plane.distance(), plane.residual1());
-    errorprofile_total->Fill(plane.distance(), plane.residual2());    
+    if(plane.residual1() < 5)errorprofile_total->Fill(plane.distance(), plane.residual1());
+    if(plane.residual2() < 5)errorprofile_total->Fill(plane.distance(), plane.residual2());    
 
     if(plane.residual1() < MinDistance && plane.residual2() < MinDistance)
      {

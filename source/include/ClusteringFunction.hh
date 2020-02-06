@@ -306,19 +306,70 @@ TCanvas* FitPeaks(myvar* Strips,
    //final combined fit
    gStyle->SetOptFit(1);
    UInt_t fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
-   //std::cout << fitresult << "\n";
-   if(fitresult != 0 && plane.distance() < 6)
+   //std::cout << fitresult << "\n";   
+   if(fitresult != 0)
     {
-     //assume very close cluster
-     totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
-                             normfit * plane.histo->GetBinContent(Peaks[0]),
-                             Peaks[0],
-                             Peaks[0],
-                             plane.true1.sigma,
-                             plane.true1.sigma
-                             );
-     //fit against
-     fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+     if(plane.distance() < 3)
+      {
+       //assume very close cluster
+       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
+                               normfit * plane.histo->GetBinContent(Peaks[0]),
+                               Peaks[0],
+                               Peaks[0],
+                               plane.true1.sigma,
+                               plane.true1.sigma
+                               );
+       //fit against
+       fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+       //recheck
+       if(fitresult == 4000)
+        {
+         //refit without minimizer
+         totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
+                                 normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
+                               Peaks[0],
+                                 Peaks[0],
+                                 plane.true1.sigma,
+                                 plane.true1.sigma
+                                 );       
+         fitresult = plane.histo->Fit("totalfit", "QR+", "", range1, range2);
+        }
+       else if( fitresult != 0)
+        {
+         //one last try with fixed parameter?
+        }
+       
+      }
+     else
+      {
+       //assume very close cluster
+       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - 2),
+                               normfit * plane.histo->GetBinContent(Peaks[0] + 2),
+                               Peaks[0] - 2,
+                               Peaks[0] + 2,
+                               plane.true1.sigma,
+                               plane.true1.sigma
+                               );
+       //fit against
+       fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+       //recheck
+       if(fitresult == 4000)
+        {
+         //refit without minimizer
+         totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - 2),
+                                 normfit * plane.histo->GetBinContent(Peaks[0] + 2),
+                                 Peaks[0] - 2,
+                                 Peaks[0] + 2,
+                                 plane.true1.sigma,
+                                 plane.true1.sigma
+                                 );         
+         fitresult = plane.histo->Fit("totalfit", "QR+", "", range1, range2);
+        }
+       else if( fitresult != 0)
+        {
+         //one last try with fixed parameter?
+        }       
+      }
     }
 
   }
