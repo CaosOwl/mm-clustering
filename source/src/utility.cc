@@ -208,7 +208,7 @@ string GetDir(const char* input,const char* escape)
  #endif
  
 //function to check if branch exist before set the branch address
-bool BranchExist(TChain* chain,TString BranchName)
+bool BranchExist(TTree* chain,TString BranchName)
 { 
 		TBranch* br = (TBranch*)chain->GetListOfBranches()->FindObject(BranchName);
 		if(br)

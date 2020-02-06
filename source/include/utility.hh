@@ -18,6 +18,8 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include <cstdio>
+#include <memory>
 
 namespace OS
 {
@@ -134,7 +136,7 @@ namespace Utils
  }
 
  //check if branch exist in chain
- bool BranchExist(TChain* chain,TString BranchName);
+ bool BranchExist(TTree* chain,TString BranchName);
 
  void AddInfoParameters(TTree* tree, TList* list);
 
@@ -147,6 +149,60 @@ namespace Utils
  }
 
  
+inline void ImportReverseMultiplexMap(UInt_t* map, TTree* tree)
+{
+ //map
+ UInt_t OriginalMap[64][5];
+ 
+ //set branch
+ Utils::SafeSetBranchAddress(tree, "MicromegasMap", OriginalMap, 1);
+ tree->GetEntry(0);
+
+ //assign it
+ for(UInt_t chan(0); chan < 64; ++chan)
+  for(UInt_t mfac(0); mfac < 5; ++mfac)
+   {
+    map[OriginalMap[chan][mfac]] = chan;
+   }
+
+}
+
+ inline std::string GetCurrentGitHash()
+ {
+  
+  std::array<char, 128> buffer;
+  std::string result;
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen("git rev-parse HEAD", "r"), pclose);
+  if (!pipe) {
+   throw std::runtime_error("popen() failed!");
+  }
+  while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+   result += buffer.data();
+  }
+  return result;
+
+ }
+
+
+ 
+ inline void SaveGitHashInTree(TTree* tree)
+ {
+
+  std::string result = GetCurrentGitHash();
+  
+  TString TheHash;
+
+  tree->Branch("GitHash", &TheHash);
+
+  TheHash = (result.c_str());
+
+  tree->Fill();
+
+  TParameter<int>* hash = new TParameter<int>(result.c_str(),10);
+  
+  tree->GetUserInfo()->Add(hash);
+
+ }
 } //end namespace Utils
 
 namespace OS
