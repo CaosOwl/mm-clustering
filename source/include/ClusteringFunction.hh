@@ -8,6 +8,8 @@
 #include "TText.h"
 #include "TBox.h"
 #include "TPaveText.h"
+#include "Math/Minimizer.h"
+#include "Math/MinimizerOptions.h"
 //std
 #include<fstream>
 
@@ -141,6 +143,16 @@ struct FitPlane
  
 };
 
+void SetFittingParameters()
+{
+ ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2", "Migrad");
+ ROOT::Math::MinimizerOptions::SetDefaultStrategy(1);
+ //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(5);
+ ROOT::Math::MinimizerOptions::SetDefaultTolerance(100);
+ //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(2e+05);
+ ROOT::Math::MinimizerOptions::SetDefaultMaxIterations(100000);
+}
+
 TF1* CreateClusFunction(Double_t range1,
                         Double_t range2,
                         const UInt_t tag = 1)
@@ -238,6 +250,9 @@ TCanvas* FitPeaks(myvar* Strips,
   }
  #endif
 
+ //Setting fit standartd
+ SetFittingParameters();
+
  //starting point for the fit
  TF1* mygaus1 = CreateClusFunction(0, nstrips - 1, 1);
  mygaus1->SetLineColor(kBlue);
@@ -295,6 +310,8 @@ TCanvas* FitPeaks(myvar* Strips,
                          mygaus2->GetParameter(2)
                          );
 
+ //set parerrors
+
  if(plane.distance() < 20)
   {
    //continue with global fit
@@ -311,33 +328,37 @@ TCanvas* FitPeaks(myvar* Strips,
     {
      if(plane.distance() < 0)
       {
-       //assume very close cluster
-       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
-                               normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
-                               Peaks[0],
-                               Peaks[0],
-                               plane.true1.sigma,
-                               plane.true1.sigma
-                               );
+       //make a Gaussian instead
+       mygaus1->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
+                              Peaks[0],
+                              plane.true1.sigma
+                              );
+       
        //fit against
-       fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+       fitresult = plane.histo->Fit("mygaus1", "QMR+", "", range1, range2);
        //recheck
        if(fitresult == 4000)
         {
          //refit without minimizer
-         totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
-                                 normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
-                                 Peaks[0],
-                                 Peaks[0],
-                                 plane.true1.sigma,
-                                 plane.true1.sigma
-                                 );       
-         fitresult = plane.histo->Fit("totalfit", "QR+", "", range1, range2);
+         mygaus1->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
+                                Peaks[0],
+                                plane.true1.sigma
+                                );         
+         fitresult = plane.histo->Fit("mygaus1", "QR+", "", range1, range2);
         }
        else if( fitresult != 0)
         {
          //one last try with fixed parameter?
         }
+
+       //reassign
+       totalfit->SetParameters(mygaus1->GetParameter(0),
+                               mygaus1->GetParameter(0),
+                               mygaus1->GetParameter(1) - 1,
+                               mygaus1->GetParameter(1) + 1,
+                               mygaus1->GetParameter(2),
+                               mygaus1->GetParameter(2)
+                               );
        
       }
      else
