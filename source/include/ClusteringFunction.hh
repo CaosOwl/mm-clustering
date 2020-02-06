@@ -146,7 +146,7 @@ struct FitPlane
 void SetFittingParameters()
 {
  ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2", "Migrad");
- ROOT::Math::MinimizerOptions::SetDefaultStrategy(2);
+ ROOT::Math::MinimizerOptions::SetDefaultStrategy(1);
  //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(5);
  ROOT::Math::MinimizerOptions::SetDefaultTolerance(100);
  //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(2e+05);
@@ -252,6 +252,17 @@ TCanvas* FitPeaks(myvar* Strips,
 
  //Setting fit standartd
  SetFittingParameters();
+ //differentiate per distance
+ if(plane.distance() < 6)
+  {
+   ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2", "Migrad");
+   ROOT::Math::MinimizerOptions::SetDefaultStrategy(2);
+  }
+ else
+  {
+   ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit", "Migrad");
+   ROOT::Math::MinimizerOptions::SetDefaultStrategy(1);
+  }
 
  //starting point for the fit
  TF1* mygaus1 = CreateClusFunction(0, nstrips - 1, 1);
