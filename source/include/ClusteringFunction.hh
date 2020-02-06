@@ -309,7 +309,7 @@ TCanvas* FitPeaks(myvar* Strips,
    //std::cout << fitresult << "\n";   
    if(fitresult != 0)
     {
-     if(plane.distance() < 3)
+     if(plane.distance() < 0)
       {
        //assume very close cluster
        totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
