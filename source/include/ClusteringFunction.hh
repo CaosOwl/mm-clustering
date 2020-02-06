@@ -245,7 +245,7 @@ TCanvas* FitPeaks(myvar* Strips,
  mygaus2->SetLineColor(kGreen);
  TF1* totalfit = CreateDoubleClusFunction("totalfit", 0, nstrips -1);
 
- const Double_t normfit = 1.5;//TMath::Sqrt(2 * TMath::Pi()) * plane.true1.sigma;
+ const Double_t normfit = 1.2;//TMath::Sqrt(2 * TMath::Pi()) * plane.true1.sigma;
  //initial fit
  if(npeaks > 1)
   {
@@ -287,15 +287,15 @@ TCanvas* FitPeaks(myvar* Strips,
   }
 
  //set parameter for the second fit
- totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
-                         normfit * plane.histo->GetBinContent(Peaks[0]),
-                         Peaks[0],
-                         Peaks[0],
-                         plane.true1.sigma,
-                         plane.true2.sigma
+ totalfit->SetParameters(mygaus1->GetParameter(0),
+                         mygaus2->GetParameter(0),
+                         mygaus1->GetParameter(1),
+                         mygaus2->GetParameter(1),
+                         mygaus1->GetParameter(2),
+                         mygaus2->GetParameter(2)
                          );
 
- if(plane.distance() < 16)
+ if(plane.distance() < 20)
   {
    //continue with global fit
    
@@ -312,8 +312,8 @@ TCanvas* FitPeaks(myvar* Strips,
      if(plane.distance() < 3)
       {
        //assume very close cluster
-       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]),
-                               normfit * plane.histo->GetBinContent(Peaks[0]),
+       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
+                               normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
                                Peaks[0],
                                Peaks[0],
                                plane.true1.sigma,
@@ -327,7 +327,7 @@ TCanvas* FitPeaks(myvar* Strips,
          //refit without minimizer
          totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
                                  normfit * plane.histo->GetBinContent(Peaks[0]) / 2,
-                               Peaks[0],
+                                 Peaks[0],
                                  Peaks[0],
                                  plane.true1.sigma,
                                  plane.true1.sigma
@@ -342,11 +342,12 @@ TCanvas* FitPeaks(myvar* Strips,
       }
      else
       {
+       const UInt_t Guess_clus_dist = 2;
        //assume very close cluster
-       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - 2),
-                               normfit * plane.histo->GetBinContent(Peaks[0] + 2),
-                               Peaks[0] - 2,
-                               Peaks[0] + 2,
+       totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - Guess_clus_dist)*0.8,
+                               normfit * plane.histo->GetBinContent(Peaks[0] + Guess_clus_dist)*0.8,
+                               Peaks[0] - Guess_clus_dist,
+                               Peaks[0] + Guess_clus_dist,
                                plane.true1.sigma,
                                plane.true1.sigma
                                );
@@ -356,10 +357,10 @@ TCanvas* FitPeaks(myvar* Strips,
        if(fitresult == 4000)
         {
          //refit without minimizer
-         totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - 2),
-                                 normfit * plane.histo->GetBinContent(Peaks[0] + 2),
-                                 Peaks[0] - 2,
-                                 Peaks[0] + 2,
+         totalfit->SetParameters(normfit * plane.histo->GetBinContent(Peaks[0] - Guess_clus_dist) * 0.8,
+                                 normfit * plane.histo->GetBinContent(Peaks[0] + Guess_clus_dist) * 0.8,
+                                 Peaks[0] - Guess_clus_dist,
+                                 Peaks[0] + Guess_clus_dist,
                                  plane.true1.sigma,
                                  plane.true1.sigma
                                  );         
