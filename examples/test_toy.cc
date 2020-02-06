@@ -76,6 +76,7 @@ int main (int argc, char *argv[])
   const UInt_t MPVCharge        = Utils::GetIntParameter(InfoTree->GetUserInfo(), "MPVCharge");
   const UInt_t Sigma            = Utils::GetIntParameter(InfoTree->GetUserInfo(), "Sigma");
   const Double_t MinDistance    = 2; //Minimal distance between strips to count it as inefficiency
+  bool IsData(false);
 
   //Connect branch
   UInt_t   Chan[NumberOfChannels];
@@ -99,7 +100,8 @@ int main (int argc, char *argv[])
      MyTree->SetBranchAddress("MM3X_ChanOutput",       Chan);
      MyTree->SetBranchAddress("MM3X_StripsOutput",  StripsPhysical);
      MyTree->SetBranchAddress("MM3XTruePosition", TruePositions);
-     PreprocessData = true;     
+     PreprocessData = true;
+     IsData = true;
     }
 
     
@@ -139,8 +141,16 @@ int main (int argc, char *argv[])
 
     //fit peaks
     FitPlane plane;
-    plane.true1 = FitClus(TruePositions[0], Sigmas[0], Charges[0]);
-    plane.true2 = FitClus(TruePositions[1], Sigmas[1], Charges[1]);
+    if(!IsData)
+     {
+      plane.true1 = FitClus(TruePositions[0], Sigmas[0], Charges[0]);
+      plane.true2 = FitClus(TruePositions[1], Sigmas[1], Charges[1]);
+     }
+    else
+     {
+      plane.true1 = FitClus(TruePositions[0], 2, 1000);
+      plane.true2 = FitClus(TruePositions[1], 2, 1000);
+     }
     TCanvas* canv = FitPeaks(StripsPhysical,
                              NumberOfStrips,
                              plane,

@@ -146,7 +146,7 @@ struct FitPlane
 void SetFittingParameters()
 {
  ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2", "Migrad");
- ROOT::Math::MinimizerOptions::SetDefaultStrategy(1);
+ ROOT::Math::MinimizerOptions::SetDefaultStrategy(2);
  //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(5);
  ROOT::Math::MinimizerOptions::SetDefaultTolerance(100);
  //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(2e+05);
