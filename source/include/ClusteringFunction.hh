@@ -249,22 +249,22 @@ TCanvas* FitPeaks(myvar* Strips,
  if(npeaks > 1)
   {
    //gaus1
-   mygaus1->SetParameter(0, plane.histo->GetBinContent(Peaks[0]));
+   mygaus1->SetParameter(0, 2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[0]));
    mygaus1->SetParameter(1, Peaks[0]);
    mygaus1->SetParLimits(1, Peaks[0] - 1, Peaks[0] + 1);
    mygaus1->SetParameter(2, plane.true1.sigma);//mygaus1->SetParameter(2, (Peaks[1] - Peaks[0]) / 2);
    //gaus2
-   mygaus2->SetParameter(0, plane.histo->GetBinContent(Peaks[1]));
+   mygaus2->SetParameter(0, 2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[1]));
    mygaus2->SetParameter(1, Peaks[1]);
    mygaus2->SetParLimits(1, Peaks[1] - 1, Peaks[1] + 1);
    mygaus2->SetParameter(2, plane.true2.sigma);//mygaus2->SetParameter(2, (Peaks[1] - Peaks[0]) / 2);
   }
  else
   {
-   mygaus1->SetParameter(0, plane.histo->GetBinContent(Peaks[0] - 2));
+   mygaus1->SetParameter(0, 2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[0] - 2));
    mygaus1->SetParameter(1, Peaks[0] - 2);
    mygaus2->SetParameter(2, plane.true1.sigma);//mygaus1->SetParameter(2, center / 2);
-   mygaus2->SetParameter(0, plane.histo->GetBinContent(Peaks[1] + 2));
+   mygaus2->SetParameter(0, 2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[1] + 2));
    mygaus2->SetParameter(1, Peaks[1] + 2);
    mygaus2->SetParameter(2, plane.true2.sigma);//mygaus2->SetParameter(2, center / 2);
   }
@@ -286,12 +286,12 @@ TCanvas* FitPeaks(myvar* Strips,
   }
 
  //set parameter for the second fit
- totalfit->SetParameters(mygaus1->GetParameter(0),
-                         mygaus2->GetParameter(0),
-                         mygaus1->GetParameter(1),
-                         mygaus2->GetParameter(1),
-                         mygaus1->GetParameter(2),
-                         mygaus2->GetParameter(2)
+ totalfit->SetParameters(2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[0]),
+                         2 * TMath::Pi() * plane.histo->GetBinContent(Peaks[0]),
+                         Peaks[0],
+                         Peaks[0],
+                         plane.true1.sigma,
+                         plane.true2.sigma
                          );
 
  if(plane.distance() < 16)
@@ -304,7 +304,21 @@ TCanvas* FitPeaks(myvar* Strips,
 
    //final combined fit
    gStyle->SetOptFit(1);
-   plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+   UInt_t fitresult = plane.histo->Fit("totalfit", "QMR+", "", range1, range2);
+   std::cout << fitresult << "\n";
+   if(fitresult == 0)
+    {
+     //assume very close cluster
+     totalfit->SetParameters(mygaus1->GetParameter(0),
+                             mygaus2->GetParameter(0),
+                             mygaus1->GetParameter(1),
+                             mygaus2->GetParameter(1),
+                             mygaus1->GetParameter(2),
+                             mygaus2->GetParameter(2)
+                             );
+     //fit again
+     
+    }
 
   }
 
