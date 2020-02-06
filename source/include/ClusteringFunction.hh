@@ -274,8 +274,16 @@ TCanvas* FitPeaks(myvar* Strips,
  mygaus2->SetParLimits(2, plane.true2.sigma -1, plane.true2.sigma + 1);
 
  //do first first fit
- plane.histo->Fit("mygaus1", "QR+", "", range1, range1 + plane.true1.sigma);
- plane.histo->Fit("mygaus2", "QR+", "", range2 - plane.true2.sigma, range2);
+ if(npeaks == 1)
+  {
+   plane.histo->Fit("mygaus1", "QR+", "", range1, range1 + 3 * plane.true1.sigma);
+   plane.histo->Fit("mygaus2", "QR+", "", range2 - 3 * plane.true2.sigma, range2);
+  }
+ else
+  {
+   plane.histo->Fit("mygaus1", "QR+");
+   plane.histo->Fit("mygaus2", "QR+");
+  }
 
  //set parameter for the second fit
  totalfit->SetParameters(mygaus1->GetParameter(0),
