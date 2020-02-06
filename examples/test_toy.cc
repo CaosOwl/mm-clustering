@@ -38,6 +38,7 @@ int main (int argc, char *argv[])
    {
     std::cerr << "INVALID NUMBER OF INPUTS \n";
     std::cout << "Usage: \n 1: inputs (.root) \n 2: number of events to analyse";
+    return 1;
    }
   //start clock to time the analysis
   Time::TimeCheck MyTime(50);
