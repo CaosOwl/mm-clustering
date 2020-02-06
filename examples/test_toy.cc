@@ -85,21 +85,21 @@ int main (int argc, char *argv[])
   Double_t Sigmas[5];
   UInt_t Charges[5];
 
-  if(Utils::BranchExist(InfoTree,"MicromegasMap"))
+  if(Utils::BranchExist(MyTree,"Strips_Physical"))
    {
-     MyTree->SetBranchAddress("MM3X_ChanOutput",       Chan);
-     MyTree->SetBranchAddress("MM3X_StripsOutput",  StripsPhysical);
-     MyTree->SetBranchAddress("MM3XTruePosition", TruePositions);
-     PreprocessData = true;
-   }
-   else
-    {
      MyTree->SetBranchAddress("ChanOutput",       Chan);
      MyTree->SetBranchAddress("Strips_Physical",  StripsPhysical);
      MyTree->SetBranchAddress("Strips_Processed", StripsProcessed);
      MyTree->SetBranchAddress("TruePosition", TruePositions);
      MyTree->SetBranchAddress("Sigma", Sigmas);
-     MyTree->SetBranchAddress("Charge", Charges);
+     MyTree->SetBranchAddress("Charge", Charges);    
+   }
+   else
+    {
+     MyTree->SetBranchAddress("MM3X_ChanOutput",       Chan);
+     MyTree->SetBranchAddress("MM3X_StripsOutput",  StripsPhysical);
+     MyTree->SetBranchAddress("MM3XTruePosition", TruePositions);
+     PreprocessData = true;     
     }
 
     
