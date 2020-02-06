@@ -82,11 +82,8 @@ int main (int argc, char *argv[])
 
   //Histograms
   TH2F* AmpvsSigma = new TH2F("AmpvsSigma", "Amplitude of the Clusters vs Sigma of the clusters; signal output; sigma [strips]",
-                              4000, 0, 4000,
+                              1000, 0, 4000,
                               15, -0.5, 14.5);
-  TH2F* ChargevsSigma = new TH2F("ChargevsSigma", "Total Charge of the Cluster vs Sigma of the clusters; signal output; sigma [strips]",
-                              4000, 0, 4000,
-                              15, -0.5, 14.5);  
   TH1F* NCluster   = new TH1F("NCluster",  "Number of clusters; NClusters",            10, 0, 10);
   TH1F* chi2       = new TH1F("chi2",      "$chi^2 of the fit; #chi^2",                1000, 0, 10);
 
