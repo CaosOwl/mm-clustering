@@ -128,7 +128,8 @@ namespace Config
   Utils::AddParameterToList(list, "Minimization",     ApplyMinimization);
   if(MinimalDistance > 0)
    Utils::AddParameterToList(list, "MinimalDistance", MinimalDistance);
-
+  if(UseUserFile)
+   Utils::AddNameToTree(tree, "FileUsed", targetfile);
   //add to user info
   Utils::AddInfoParameters(tree, list);
 
@@ -140,15 +141,29 @@ namespace Config
  {
   TString outname;
 
-  outname.Form("%s%i_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
-               header,
-               NClusters,
-               NumberOfChannels,
-               MultiplexFactor,
-               MPVCharge,
-               Sigma
-               );
-
+  if(UseUserFile)
+   {
+    //just output the user file
+    outname.Form("%s%i_Chan%i_Mult%i_UseFile%s",
+                 header,
+                 NClusters,
+                 NumberOfChannels,
+                 MultiplexFactor,
+                 Utils::GetBaseName(targetfile.c_str()).c_str()
+                 );
+   }
+  else
+   {
+    outname.Form("%s%i_Chan%i_Mult%i_MPVCharge%i_Sigma%0.0f",
+                 header,
+                 NClusters,
+                 NumberOfChannels,
+                 MultiplexFactor,
+                 MPVCharge,
+                 Sigma
+                 );
+   }
+  
   //minimization applied
   if(ApplyMinimization) outname += TString::Format("_minimizedLambda%0.2f",LambdaMin);
 
