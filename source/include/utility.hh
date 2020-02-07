@@ -148,6 +148,18 @@ namespace Utils
   return true;
  }
 
+ inline bool AddNameToTree(TTree* tree, const char* name, std::string target)
+ {
+  
+  TString TheName(target.c_str());
+  
+  tree->Branch(name, &TheName);
+  
+  tree->Fill();
+  
+  return true;
+ } 
+
  
 inline void ImportReverseMultiplexMap(UInt_t* map, TTree* tree)
 {
