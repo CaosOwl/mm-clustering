@@ -175,6 +175,8 @@ namespace Micromega
   histo->SetDirectory(0);
   for(UInt_t i(0); i < clustertotalcharge; ++i)histo->Fill(gRandom->Gaus(clusterposition, clustersigma));
   for(UInt_t i(0); i < NumberOfStrips; ++i)StripsOutput[i] += histo->GetBinContent(i);
+  //cleaning memory
+  delete histo;
  }
 
  bool ToyDataCreator::GenerateToy(UInt_t* Chan,
