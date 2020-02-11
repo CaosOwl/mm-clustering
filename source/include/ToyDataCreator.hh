@@ -20,7 +20,7 @@ namespace Micromega
   ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const MapMethod mapmethod = ALGO);
   ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const TString filename);
  
-  bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true, const Double_t minimaldistance = -1);
+  bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true, UInt_t minimaldistance = 0, UInt_t maximaldistance = 9999);
 
   //get functions
   Double_t GetPosition(UInt_t index);

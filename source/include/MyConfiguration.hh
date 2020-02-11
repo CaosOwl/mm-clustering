@@ -36,7 +36,8 @@ namespace Config
   myint          GetNumberOfStrips() const          { return NumberOfStrips;}
   myint          GetMPVCharge() const               { return MPVCharge;}
   myfloat        GetSigma() const                   { return Sigma;}
-  myfloat        GetMinimalDistance() const         { return MinimalDistance;}
+  myint          GetMinimalDistance() const         { return MinimalDistance;}
+  myint          GetMaximalDistance() const         { return MaximalDistance;}  
   myfloat        GetLambdaMin() const               { return LambdaMin;}
   std::string    GetOutDir() const                  { return outdir;}
   std::string    GetTargetFile() const              { return targetfile;}
@@ -60,7 +61,8 @@ namespace Config
   myint     NumberOfStrips;
   myint     MPVCharge;
   myfloat   Sigma;
-  myfloat   MinimalDistance;
+  myint     MinimalDistance;
+  myint     MaximalDistance;
   myfloat   LambdaMin;
   //switches
   bool      MultiplexFromFile;

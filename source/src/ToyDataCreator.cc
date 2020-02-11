@@ -184,13 +184,23 @@ namespace Micromega
                                   Double_t* Strips_Processed,
                                   const UInt_t NumberOfClusters,
                                   const bool DoMinimization,
-                                  const Double_t minimaldistance)
+                                  UInt_t minimaldistance,
+                                  UInt_t maximaldistance                                  
+                                  )
  {
 
   //reset variables
   for(UInt_t chan(0); chan < NumberOfChannels; ++chan)Chan[chan] = 0;
   for(UInt_t strip(0); strip < NumberOfStrips; ++strip){Strips_Physical[strip] = 0;Strips_Processed[strip] = 0.;}
 
+  //redefine distance as needed
+  maximaldistance = maximaldistance > NumberOfStrips ? NumberOfStrips : maximaldistance;
+  if(minimaldistance >= maximaldistance)
+   {
+    std::cerr << "ERROR: minimal distance larger than maximal distance in @GenerateToy \n";
+    return false;
+   }
+   
 
   //clear vectors
   Clear();
@@ -200,15 +210,24 @@ namespace Micromega
   for(UInt_t n(0); n < NumberOfClusters; ++n)
    {
     //throw random values for all relevant output of a cluster    
-    if(minimaldistance < 0 || clusterposition < 0)
+    if(clusterposition < 0 || (minimaldistance == 0 && maximaldistance == NumberOfStrips))
      {
       clusterposition = gRandom->Uniform(0, NumberOfStrips);
      }
     else
      {
-      clusterposition = gRandom->Uniform(clusterposition - minimaldistance, clusterposition + minimaldistance);
-      while(clusterposition < 0 || clusterposition > NumberOfStrips)
-       clusterposition = gRandom->Uniform(clusterposition - minimaldistance, clusterposition + minimaldistance);
+      Double_t distance    = (1. - 2. * gRandom->Integer(2) ) * gRandom->Uniform(minimaldistance, maximaldistance);
+      UInt_t counter(1);
+      while(((clusterposition+distance) < 0 || (clusterposition+distance) > NumberOfStrips) && counter < 5)
+       {
+        distance    = (1. - 2. * gRandom->Integer(2) ) * gRandom->Uniform(minimaldistance, maximaldistance);
+        ++counter;
+       }
+      //assign it
+      if(counter > 5)
+       clusterposition = gRandom->Uniform(0, NumberOfStrips); //roll back to uniform (add a warning?)
+      else       
+       clusterposition += distance; //add distance      
      }
     
     CreateCluster(Strips_Physical,

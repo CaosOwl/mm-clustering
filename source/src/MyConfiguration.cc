@@ -19,7 +19,8 @@ namespace Config
   NumberOfStrips            = MultiplexFactor * NumberOfChannels;
   MPVCharge                 = 100;
   Sigma                     = 3;
-  MinimalDistance           = -1;
+  MinimalDistance           = 0;
+  MaximalDistance           = 9999;
   LambdaMin                 = 1;
   MultiplexFromFile         = false;
   SaveWaveforms             = false;
@@ -49,6 +50,7 @@ namespace Config
   configuration.GetOption(NClusters,             "nclusters"             );   
   configuration.GetOption(Sigma,                 "amplitude"             );
   configuration.GetOption(MinimalDistance,       "min-distance"          );
+  configuration.GetOption(MaximalDistance,       "max-distance"          );
   configuration.GetOption(LambdaMin,             "lambda-min"            );
   configuration.GetOption(MPVCharge,             "charge"                );
   configuration.GetOption(outdir,                "outdir"                );
@@ -75,7 +77,7 @@ namespace Config
 
   if(targetfile != "dummy")
    {
-    std::cout << "--> Attempting to use \033[1;31m" << targetfile << " \033[0m to create the multiplex map \n";
+    std::cout << "--> Attempting to use \033[1;31m" << targetfile << " \033[0m to create the multiplex map and for noise / clustering \n";
     UseUserFile = true;
    }
   else if(!MultiplexFromFile)
@@ -98,7 +100,12 @@ namespace Config
   if(MinimalDistance > 0)
    {
     std::cout << "\033[1;34m --> Minimal distance between clusters will be: \033[0m \033[1;31m" << MinimalDistance << " strips\033[0m \n";
-   }   
+   }
+
+  if(MaximalDistance < NumberOfStrips)
+   {
+    std::cout << "\033[1;34m --> Maximal distance between clusters will be: \033[0m \033[1;31m" << MaximalDistance << " strips\033[0m \n";
+   }
     
   //CreateOutDirectory();
   std::cout << "\033[1;34m --> Result will be saved in directory: \033[0m \033[1;31m " << outdir << "\033[0m \n";
@@ -128,6 +135,8 @@ namespace Config
   Utils::AddParameterToList(list, "Minimization",     ApplyMinimization);
   if(MinimalDistance > 0)
    Utils::AddParameterToList(list, "MinimalDistance", MinimalDistance);
+  if(MaximalDistance < NumberOfStrips)
+   Utils::AddParameterToList(list, "MaximalDistance", MaximalDistance);  
   if(UseUserFile)
    Utils::AddNameToTree(tree, "FileUsed", targetfile);
   //add to user info
@@ -168,7 +177,10 @@ namespace Config
   if(ApplyMinimization) outname += TString::Format("_minimizedLambda%0.2f",LambdaMin);
 
   //minimal distance
-  if(MinimalDistance > 0) outname += TString::Format("_mindist%0.0f", MinimalDistance);
+  if(MinimalDistance > 0) outname += TString::Format("_mindist%i", MinimalDistance);
+
+  //maximal distance
+  if(MaximalDistance < NumberOfStrips) outname += TString::Format("_maxdist%i", MaximalDistance);  
 
   return outname;
  }

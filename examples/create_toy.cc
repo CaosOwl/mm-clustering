@@ -141,7 +141,8 @@ int main (int argc, char *argv[])
                          StripsOutputProcessed,
                          config->GetNClusters(),         //number of clusters to generate
                          config->MinimizationSwitch(),   //If minimization procedure must be applied or not
-                         config->GetMinimalDistance()   //minimal distance between the clusters
+                         config->GetMinimalDistance(),   //minimal distance between the clusters
+                         config->GetMaximalDistance()    //maximal distance between the clusters
                          );
 
     //assign true
