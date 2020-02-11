@@ -124,6 +124,16 @@ namespace Micromega
   data_v.clear();
  }
 
+ void ToyDataCreator::ResetInput(UInt_t* Chan,
+                                 UInt_t* Strips_Physical,
+                                 Double_t* Strips_Processed
+                                 ) const
+ {
+  //clear inputs before processing
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)Chan[chan] = 0;
+  for(UInt_t strip(0); strip < NumberOfStrips; ++strip){Strips_Physical[strip] = 0;Strips_Processed[strip] = 0.;}  
+ }
+
 
  void ToyDataCreator::CreateCluster(UInt_t* StripsOutput,
                                     const Double_t clusterposition,
@@ -185,13 +195,12 @@ namespace Micromega
                                   const UInt_t NumberOfClusters,
                                   const bool DoMinimization,
                                   UInt_t minimaldistance,
-                                  UInt_t maximaldistance                                  
+                                  UInt_t maximaldistance
                                   )
  {
 
   //reset variables
-  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)Chan[chan] = 0;
-  for(UInt_t strip(0); strip < NumberOfStrips; ++strip){Strips_Physical[strip] = 0;Strips_Processed[strip] = 0.;}
+  ResetInput(Chan, Strips_Physical, Strips_Processed);
 
   //redefine distance as needed
   maximaldistance = maximaldistance > NumberOfStrips ? NumberOfStrips : maximaldistance;
@@ -236,6 +245,62 @@ namespace Micromega
                   );
    }
 
+
+  //process the plane
+  return ProcessPlane(Chan,
+                      Strips_Physical,
+                      Strips_Processed,
+                      DoMinimization);
+
+  
+ }
+
+  bool ToyDataCreator::GenerateToy(UInt_t* Chan,
+                                   UInt_t* Strips_Physical,
+                                   Double_t* Strips_Processed,
+                                   Double_t position1,
+                                   Double_t position2,
+                                   const bool DoMinimization
+                                  )
+ {
+
+  //reset variables
+  ResetInput(Chan, Strips_Physical, Strips_Processed);
+   
+
+  //clear vectors
+  Clear();
+
+  //create the two EVENTS
+  CreateCluster(Strips_Physical,
+                position1,
+                clustermethod
+                );
+  CreateCluster(Strips_Physical,
+                position2,
+                clustermethod
+                );   
+
+
+  //process the plane
+  return ProcessPlane(Chan,
+                      Strips_Physical,
+                      Strips_Processed,
+                      DoMinimization);
+
+  
+ }
+
+ 
+
+ bool ToyDataCreator::ProcessPlane (UInt_t* Chan,
+                                    UInt_t* Strips_Physical,
+                                    Double_t* Strips_Processed,
+                                    const bool DoMinimization
+                                    )
+
+ {
+  
 
 
   //define multiplexing output
@@ -295,10 +360,7 @@ namespace Micromega
     NumericalMinimization(Strips_Processed, verbose, LambdaMin);
    }
     
-  return true;
-  
-  
-  
+  return true;    
  }
 
  void ToyDataCreator::FillMultiplexingMatrix(const MapMethod mapmethod)
