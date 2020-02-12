@@ -18,7 +18,8 @@ namespace Micromega
  public:
   //CONSTRUCTOR
   ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const MapMethod mapmethod = ALGO);
-  ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const TString filename);
+  ToyDataCreator(const UInt_t,const UInt_t,const UInt_t,const Double_t, const TString filename, const bool useoptimalmmap = false);
+  ToyDataCreator(const UInt_t,const UInt_t,const TString filename, const bool useoptimalmmap = false);
  
   bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const UInt_t NumberOfClusters = 1, const bool DoMinimization = true, UInt_t minimaldistance = 0, UInt_t maximaldistance = 9999);
   bool GenerateToy(UInt_t*, UInt_t*, Double_t*, const Double_t, const Double_t, const bool DoMinimization = true);
@@ -68,6 +69,7 @@ namespace Micromega
   std::vector<UInt_t> charges;
 
   //PRIVATE FUNCTIONS
+  void InitiliazeMinimizationMatrices() const;
   void FillRegMatrix();
   void FillMultiplexingMatrix(const MapMethod);
   void FillData(const UInt_t);  

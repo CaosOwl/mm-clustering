@@ -30,18 +30,10 @@ namespace Micromega
  {
   //calcualte number of strips
   NumberOfStrips = NumberOfChannels * MultiplexFactor;
+  
   //Initiliaze Balint Matrices (defined at global level)
-  mmultiplex = SparseMatrix<double>(NumberOfChannels, NumberOfStrips);
-  vstrips = MatrixXd(NumberOfStrips, 1);
-  vmultiplex = MatrixXd(NumberOfChannels, 1);
-  mQ2 = MatrixXd(NumberOfStrips, 1);
-  mQ2T = MatrixXd(1, NumberOfStrips);
-  ms = MatrixXd(1,1);
-  mreg = SparseMatrix<double>(NumberOfStrips, NumberOfStrips);
-  //other globals
-  NStrips = NumberOfStrips;
-  NChan   = NumberOfChannels;
-  MFac    = MultiplexFactor;
+  InitializeMinimizationMatrices();  
+  
   //reverse multiplex map
   ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
 
@@ -58,7 +50,8 @@ namespace Micromega
                                 const UInt_t MultiplexFactor_,
                                 const UInt_t MPVCharge_,
                                 const Double_t Sigma_,
-                                const TString filename
+                                const TString filename,
+                                const bool useoptimalmmap
                                 )
   :
   NumberOfChannels(NumberOfChannels_),
@@ -73,18 +66,10 @@ namespace Micromega
  {
   //calcualte number of strips
   NumberOfStrips = NumberOfChannels * MultiplexFactor;
+  
   //Initiliaze Balint Matrices (defined at global level)
-  mmultiplex = SparseMatrix<double>(NumberOfChannels, NumberOfStrips);
-  vstrips = MatrixXd(NumberOfStrips, 1);
-  vmultiplex = MatrixXd(NumberOfChannels, 1);
-  mQ2 = MatrixXd(NumberOfStrips, 1);
-  mQ2T = MatrixXd(1, NumberOfStrips);
-  ms = MatrixXd(1,1);
-  mreg = SparseMatrix<double>(NumberOfStrips, NumberOfStrips);
-  //other globals
-  NStrips = NumberOfStrips;
-  NChan   = NumberOfChannels;
-  MFac    = MultiplexFactor;
+  InitializeMinimizationMatrices();  
+
   //reverse multiplex map
   ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
 
@@ -94,7 +79,14 @@ namespace Micromega
 
   //initialize maps
   FillRegMatrix();
-  //decide what kind of file it is
+  if(useoptimalmmap)
+   {
+    FillMultiplexingMatrix(Micromega::MapMethod::TXT); 
+   }
+  else
+   {
+    //decide if file contains multiplex map
+    //decide what kind of file it is
   const bool ItExist = Utils::FileExist(filename);
   if(ItExist)
    {
@@ -111,6 +103,67 @@ namespace Micromega
       std::cout << "\033[1;34m WARNING: \033[0m" << filename << " has an unknown format, using algorithm for multiplexing map \n";
       BuildMultiplexingFromAlgorithm();
      }
+   }
+   }
+
+ }
+
+  ToyDataCreator::ToyDataCreator(const UInt_t NumberOfChannels_,
+                                const UInt_t MultiplexFactor_,
+                                 const TString filename,
+                                 const bool useoptimalmmap
+                                )
+  :
+  NumberOfChannels(NumberOfChannels_),
+  MultiplexFactor(MultiplexFactor_),
+  MPVCharge(1000),
+  ChargeSigma(20.), //from Landau fit of run 4238 MM3X  
+  Sigma(1),
+  verbose(0),
+  LambdaMin(1.),  
+  noisemethod(NoiseMethod::NONE),
+  clustermethod(ClusterMethod::GAUS)
+ {
+  //calcualte number of strips
+  NumberOfStrips = NumberOfChannels * MultiplexFactor;
+  
+  //Initiliaze Balint Matrices (defined at global level)
+  InitializeMinimizationMatrices();
+  
+  //reverse multiplex map
+  ReverseMultiplexMAP = std::vector<UInt_t>(NumberOfStrips, 0);
+
+  //reserve noise
+  Noise.reserve(NumberOfChannels);
+  for(UInt_t n(0); n < NumberOfChannels; ++n)Noise[n] = 0;
+
+  //initialize maps
+  FillRegMatrix();
+  if(useoptimalmmap)
+   {
+    FillMultiplexingMatrix(Micromega::MapMethod::TXT); 
+   }
+  else
+   {
+    //decide if file contains multiplex map
+    //decide what kind of file it is
+  const bool ItExist = Utils::FileExist(filename);
+  if(ItExist)
+   {
+    if(filename.EndsWith(".root"))
+     {
+      BuildMultiplexingFromROOTFile(filename);
+     }
+    else if(filename.EndsWith(".txt"))
+     {
+      BuildMultiplexingFromTXTFile(filename);
+     }
+    else
+     {
+      std::cout << "\033[1;34m WARNING: \033[0m" << filename << " has an unknown format, using algorithm for multiplexing map \n";
+      BuildMultiplexingFromAlgorithm();
+     }
+   }
    }
 
  }
@@ -397,6 +450,21 @@ namespace Micromega
    default:
     BuildMultiplexingFromAlgorithm();
    }
+ }
+
+ void ToyDataCreator::InitializeMinimizationMatrices() const
+ {  
+  mmultiplex = SparseMatrix<double>(NumberOfChannels, NumberOfStrips);
+  vstrips = MatrixXd(NumberOfStrips, 1);
+  vmultiplex = MatrixXd(NumberOfChannels, 1);
+  mQ2 = MatrixXd(NumberOfStrips, 1);
+  mQ2T = MatrixXd(1, NumberOfStrips);
+  ms = MatrixXd(1,1);
+  mreg = SparseMatrix<double>(NumberOfStrips, NumberOfStrips);
+  //other globals
+  NStrips = NumberOfStrips;
+  NChan   = NumberOfChannels;
+  MFac    = MultiplexFactor;
  }
 
  void ToyDataCreator::FillRegMatrix()

@@ -94,12 +94,15 @@ int main (int argc, char *argv[])
                                             config->GetMultiplexFactor(),
                                             config->GetMPVCharge(),
                                             config->GetSigma(),
-                                            targetfile
+                                            targetfile,
+                                            config->MultiplexFromFileSwitch()
                                             );
-    //noise as well
+    
+    //noise as well and sigma taken from file
     Creator->InitializeNoiseFromROOTFile(config->GetTargetFile().c_str(), "MM3X_sigma");
     Creator->InitializeChargeVsSigmaHisto(config->GetTargetFile().c_str(), "mm3x_chargeVSamplitude");
     Creator->SetNoiseMethod(Micromega::NoiseMethod::FROMFILE);
+    
    }
   else
    {
