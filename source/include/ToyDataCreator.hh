@@ -69,7 +69,7 @@ namespace Micromega
   std::vector<UInt_t> charges;
 
   //PRIVATE FUNCTIONS
-  void InitiliazeMinimizationMatrices() const;
+  void InitializeMinimizationMatrices() const;
   void FillRegMatrix();
   void FillMultiplexingMatrix(const MapMethod);
   void FillData(const UInt_t);  
