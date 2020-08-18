@@ -99,9 +99,10 @@ int main (int argc, char *argv[])
                                             );
     
     //noise as well and sigma taken from file
-    Creator->InitializeNoiseFromROOTFile(config->GetTargetFile().c_str(), "MM3X_sigma");
+    //Creator->InitializeNoiseFromROOTFile(config->GetTargetFile().c_str(), "MM3X_sigma");
+    Creator->InitializeFlatNoise(10);
     Creator->InitializeChargeVsSigmaHisto(config->GetTargetFile().c_str(), "mm3x_chargeVSamplitude");
-    Creator->SetNoiseMethod(Micromega::NoiseMethod::FROMFILE);
+    Creator->SetNoiseMethod(Micromega::NoiseMethod::NONE);
     
    }
   else

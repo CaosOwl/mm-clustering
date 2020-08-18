@@ -9,7 +9,7 @@
 namespace Micromega
 {
  enum ClusterMethod{GAUS, GAUSFROMFILE};
- enum NoiseMethod{NONE, FROMFILE};
+ enum NoiseMethod{NONE, FLAT, FROMFILE};
  enum MapMethod{ALGO, TXT, ROOT};
  
  class ToyDataCreator
@@ -40,6 +40,7 @@ namespace Micromega
   //utilities
   void SaveParameterInTree(TTree*) const;
   void InitializeNoiseFromROOTFile(const char*, const char* branchname = "MM3X_sigma");
+  void InitializeFlatNoise(const UInt_t);
   std::vector<UInt_t> CreateMultiplexedStrips(UInt_t*) const;
   bool IsStripValid(const UInt_t*, const UInt_t,const UInt_t noisesigma = 2) const;
   void DoLambdaScan(UInt_t*, std::vector<Double_t>&, std::vector<Double_t>&);

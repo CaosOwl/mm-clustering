@@ -381,6 +381,9 @@ namespace Micromega
      case FROMFILE:
       //use saved noise
       noise = gRandom->Gaus(0, Noise[chan]);
+     case FLAT:
+      //use saved noise
+      noise = gRandom->Gaus(0, Noise[chan]);      
       break;
      default:
       break;
@@ -595,8 +598,22 @@ namespace Micromega
     Noise[chan] = NOISE[chan];
    }
   //exit(1);
-  file->Close();  
+  file->Close();
+
+  //change noise method
+  noisemethod = Micromega::NoiseMethod::FROMFILE;
  }
+
+ void ToyDataCreator::InitializeFlatNoise(const UInt_t noise)
+ {
+  //set all noise array to noise
+  for(UInt_t chan(0); chan < NumberOfChannels; ++chan)
+   {
+    Noise[chan] = noise;
+   }
+  //set noise method to flat
+  noisemethod = Micromega::NoiseMethod::FLAT;
+ } 
 
  std::vector<UInt_t> ToyDataCreator::CreateMultiplexedStrips(UInt_t* Chan) const
  {
