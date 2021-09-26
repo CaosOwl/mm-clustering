@@ -125,7 +125,7 @@ int main (int argc, char *argv[])
                           minima,
                           scanpoints);
 
-    for(UInt_t i(0), i < ScanPoints; ++i)
+    for(UInt_t i(0); i < ScanPoints; ++i)
      {
       scan->Fill(scanpoints[i], minima[i]);
      }
