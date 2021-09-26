@@ -1,0 +1,59 @@
+build:
+  stage: test
+  
+  # install the necessary build tools
+  before_script:
+    - yum -q -y install gcc-gfortran expat-devel boost-devel root root-physics root-montecarlo-eg root-smatrix root-graf3d-eve root-gdml eigen3-devel pip pip3
+    - pip3 install hdf5 pytables numpy root_numpy
+    - g++ --version
+    - cmake --version
+    - root-config --version
+    - root-config --features
+  
+  # 1. build all example file
+  # 2. test using default config
+  script:
+    - make
+    - ./create_toy ./config/test.cfg
+    - root -l -q skripts/test.C
+    - root2hdf5 test.root
+  
+  artifacts:
+    paths:
+      - *.root
+      - *.pdf
+      - *.h5
+
+cppcheck:
+  stage: test
+  
+  before_script:
+    - yum -q -y install cppcheck
+  
+  script:
+    # https://gitlab.cern.ch/help/user/project/merge_requests/code_quality.md#implementing-a-custom-tool
+    - cppcheck --quiet --enable=all --inconclusive source --template='{file};{line};{severity};{id};{message}' >& cppcheck.txt
+    - awk -F\; -f .cppcheck.awk cppcheck.txt > cppcheck.json
+    
+    - cppcheck --quiet --enable=all --inconclusive source/src
+    - cppcheck --quiet --enable=all --inconclusive source/include
+    - cppcheck --quiet --enable=all --inconclusive examples/
+  
+  artifacts:
+    reports:
+      codequality: cppcheck.json
+    paths:
+      - cppcheck.txt
+      - cppcheck.json
+
+cloc:
+  stage: test
+  
+  before_script:
+    - yum -q -y install cloc
+  
+  script:
+    - cloc .
+    - cloc source/src
+    - cloc source/include
+    - cloc examples
