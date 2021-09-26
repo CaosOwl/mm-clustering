@@ -1,12 +1,54 @@
 * Short description
-This repository was created
+This repository was created to produce some toy data to train the NN and test the capabilities of hit reconstruction in a high occupancy environment.
 * Data 
 ** Data reconstruction
    All the code to extract MM clusters from the na64 are saved in a branch of the main na64
    git repository [[https://gitlab.cern.ch/P348/p348-daq/tree/mm-clustering][link]]
 ** Data format
+   Data are saved in a root file and then automatically converted in hdf5 using the script root2hdf5 (http://www.rootpy.org/commands/root2hdf5.html).
+   The file contains the following information:
+   - *ChanOutput:* output of the micromegas channel
+   - *Strips_Physical:* Physical charge recorded by strip, before multiplex map is applied
+   - *Strips_Processed:* Output of the strips after multiplex map is applied
+   - *TruePosition:* True position of the particle as it hits the detector
+   - *Sigma* Spread of the charge in the event
+   - *Charge* Total charge deposited in the detector
+
+  The following metainformation are contained in the file:
+  - The Multiplexed map used to produce the file
+  - The noise map of each channel
+  - Parameters that characterise the plane, namely:
+    + Number of channel
+    + Number of strips
+    + Multiplexed factor (<number of strips> / <number of channel>)
+    + Most probable charge left by the particle
+    + The sigma of the Landau distribution of the charge
+    + Number of clusters simulated
+    + If smoothing algorithm was used for the strips
+    + Has of the git repository version used to produce this file
+** List of option
+   Below the option to configure the toy creator:
+  - *events*              sets number of events to create / process
+  - *outdir*              select destination where to move the outputs
+  - *outname*             select output file name instead of standard
+  - *use-file*            use this file for multiplexing map and noise
+  - *verbose*             set verbose level
+  - *channels*            set number of channels
+  - *mfactor*             set multiplex factor
+  - *nclusters*           Number of clusters per event
+  - *charge*              set most probable charge of the landau
+  - *amplitude*           set amplitude of clusters in sigma
+  - *min-distance*        set minimal distance between clusters in strip size
+  - *max-distance*        set maximal distance between clusters in strip size
+  - *lambda-min*          lambda used for the minimization function
+  - *from-file*           take multiplex map from file
+  - *save-waveforms*      save all created cluster in histograms
+  - *apply-minimization*  apply minimization procedure to strips
+  - *compression*         level of the root file
+   
 ** Run description
-   [[./doc/runlist.pdf][run list]]
+   a complete list of run can be found here: [[./doc/runlist.pdf][run list]]. The table below list some of the most important.   
+   
    |  Run | Trigger           | S_1,10^3 | Run Type                                    | note                       |
    |------+-------------------+----------+---------------------------------------------+----------------------------|
    | 4038 | S1-4-V0           | 6600     | 100 GeV Calibration Electron Invisible 2018 |                            |
@@ -14,7 +56,3 @@ This repository was created
    | 4267 | S1-2-V0-Wcat+S4   | ----     | 150 GeV Calibration Hadron Visible 2018     | Changeof latency for MSADC |
    | 4238 | S1-2-V0-Wcat      | 3500     | 150 GeV calibration Electron Visible 2018   |                            |
    |      |                   |          |                                             |                            |
-* Discussions
-* Diary
-** <2020-01-15 Wed>
-   - 
