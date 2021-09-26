@@ -23,7 +23,7 @@ namespace Config
   
   //ACCESSORIES
   bool CreateOutDirectory();
-  TString CreateOutputName(const char*) const;
+  TString CreateOutputName(const char*);
   bool SaveParamterInTree(TTree*);
 
   //GET FUNCTIONS
@@ -39,7 +39,6 @@ namespace Config
   myint          GetMinimalDistance() const         { return MinimalDistance;}
   myint          GetMaximalDistance() const         { return MaximalDistance;}  
   myfloat        GetLambdaMin() const               { return LambdaMin;}
-  std::string    GetOutDir() const                  { return outdir;}
   std::string    GetTargetFile() const              { return targetfile;}
   TString        GetFileNamePath() const            { return outname;}
   //Switches
@@ -73,6 +72,7 @@ namespace Config
   TString     outname;
   std::string targetfile;
   std::string outdir;
+  std::string outname_;
   
  };
 

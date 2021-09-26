@@ -54,6 +54,7 @@ namespace Config
   configuration.GetOption(LambdaMin,             "lambda-min"            );
   configuration.GetOption(MPVCharge,             "charge"                );
   configuration.GetOption(outdir,                "outdir"                );
+  configuration.GetOption(outname_,              "outname"               );
   configuration.GetOption(targetfile,            "use-file"              );
   //switches
   configuration.GetOption(SaveWaveforms,         "save-waveforms"        );
@@ -62,6 +63,7 @@ namespace Config
   
   //Calculate rest
   NumberOfStrips = MultiplexFactor * NumberOfChannels;
+  outname = outname_.c_str();
 
 
   //SUMMARY
@@ -146,9 +148,8 @@ namespace Config
   
  }
 
-  TString MyConfiguration::CreateOutputName(const char* header) const
+  TString MyConfiguration::CreateOutputName(const char* header)
  {
-  TString outname;
 
   if(UseUserFile)
    {

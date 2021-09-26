@@ -50,7 +50,8 @@ int main (int argc, char *argv[])
   
 
   //Define outputs
-  TString outputname = config->CreateOutputName("ToyCluster");
+  //TString outputname = config->CreateOutputName("ToyCluster");
+  TString outputname = config->GetFileNamePath();
 
   TFile* output = new TFile(outputname +".root", "RECREATE");  
   output->SetCompressionSettings(config->GetCompressionLevel());

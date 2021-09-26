@@ -3,7 +3,8 @@
 // **** General-Purpose ConfigManager class used to manage configurations ****
 // ***************************************************************************
 //
-// $Id: ConfigManager.conf.hh Wed 2016-10-26 12:02:18 UTC Michael W. Heiss $
+// $Id: ConfigManager.conf.hh Wed 2016-10-26 12:02:18 UTC Michael W. Heiss
+// Maintained by Emilio Depero 
 //
 /// \file ConfigManager.conf.hh
 /// \brief Configuration of the ConfigManager class
@@ -77,6 +78,8 @@ constexpr const char* ConfigManagerConfiguration[][4] =
         ,
         {"outdir","string","select destination where to move the outputs","all"}
         ,
+        {"outname","string","select output file name instead of standard","all"}
+        ,	
         {"use-file","string","use this file for multiplexing map and noise","all"}
         ,        
         {"verbose","int","set verbose level","all"}
